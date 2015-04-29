@@ -2,7 +2,6 @@ package echo
 
 import (
 	"github.com/kyokomi/slackbot/plugins"
-	"github.com/nlopes/slack"
 	"golang.org/x/net/context"
 )
 
@@ -19,7 +18,7 @@ func (r EchoMessage) CheckMessage(ctx context.Context, message string) (bool, st
 	return true, message
 }
 
-func (r EchoMessage) DoAction(ctx context.Context, msEvent *slack.MessageEvent, message string, sendMessageFunc func(message string)) bool {
+func (r EchoMessage) DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool {
 	sendMessageFunc(message)
 	return true // next ok
 }
