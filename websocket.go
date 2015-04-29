@@ -6,6 +6,7 @@ import (
 
 	"log"
 
+	"github.com/kyokomi/slackbot/slackctx"
 	"github.com/nlopes/slack"
 	"golang.org/x/net/context"
 )
@@ -32,16 +33,16 @@ func WebSocketRTM(ctx context.Context, config BotConfig) {
 		log.Fatal("ERROR: slack token not found")
 	}
 
-	ctx = NewSlackClient(ctx, config.Name, config.SlackToken)
-	ctx = NewSlackRTM(ctx, config.Protocol, config.Origin)
+	ctx = slackctx.NewSlackClient(ctx, config.Name, config.SlackToken)
+	ctx = slackctx.NewSlackRTM(ctx, config.Protocol, config.Origin)
 
 	chSender := make(chan slack.OutgoingMessage)
 	chReceiver := make(chan slack.SlackEvent)
 
-	api := FromSlackClient(ctx)
+	api := slackctx.FromSlackClient(ctx)
 	api.SetDebug(true)
 
-	wsAPI := FromSlackRTM(ctx)
+	wsAPI := slackctx.FromSlackRTM(ctx)
 	go wsAPI.HandleIncomingEvents(chReceiver)
 	go wsAPI.Keepalive(config.KeepAlive)
 	go func(wsAPI *slack.SlackWS, chSender chan slack.OutgoingMessage) {

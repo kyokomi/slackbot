@@ -1,4 +1,4 @@
-package slackbot
+package slackctx
 
 import (
 	"github.com/nlopes/slack"
@@ -8,8 +8,9 @@ import (
 type key string
 
 const (
-	slackClientKey key = "SlackClient"
-	slackRTMKey    key = "SlackRTM"
+	slackClientKey  key = "SlackClient"
+	slackRTMKey     key = "SlackRTM"
+	messageEventKey key = "MessageEventKey"
 )
 
 type SlackClient struct {
@@ -41,4 +42,12 @@ func NewSlackRTM(ctx context.Context, protocol, origin string) context.Context {
 
 func FromSlackRTM(ctx context.Context) *slack.SlackWS {
 	return ctx.Value(slackRTMKey).(*slack.SlackWS)
+}
+
+func WithMessageEvent(ctx context.Context, msEvent *slack.MessageEvent) context.Context {
+	return context.WithValue(ctx, messageEventKey, msEvent)
+}
+
+func FromMessageEvent(ctx context.Context) *slack.MessageEvent {
+	return ctx.Value(messageEventKey).(*slack.MessageEvent)
 }

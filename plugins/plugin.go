@@ -3,7 +3,6 @@ package plugins
 import (
 	"fmt"
 
-	"github.com/nlopes/slack"
 	"golang.org/x/net/context"
 )
 
@@ -33,22 +32,21 @@ func init() {
 
 type BotMessagePlugin interface {
 	CheckMessage(ctx context.Context, message string) (bool, string)
-	DoAction(ctx context.Context, msEvent *slack.MessageEvent, message string, sendMessageFunc func(message string)) bool
+	DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool
 }
 
 func Context() context.Context {
 	return ctx
 }
 
-func ExecPlugins(ctx context.Context, msEvent *slack.MessageEvent, sendMessageFunc func(message string)) {
-	// 条件のfuncとOK時のfunc
+func ExecPlugins(ctx context.Context, message string, sendMessageFunc func(message string)) {
 	for _, p := range plugins {
-		ok, m := p.CheckMessage(ctx, msEvent.Text)
+		ok, m := p.CheckMessage(ctx, message)
 		if !ok {
 			continue
 		}
 
-		next := p.DoAction(ctx, msEvent, m, sendMessageFunc)
+		next := p.DoAction(ctx, m, sendMessageFunc)
 		if !next {
 			break
 		}
