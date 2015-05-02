@@ -2,7 +2,6 @@ package lgtm
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kyokomi/slackbot/plugins"
@@ -19,10 +18,7 @@ type LGTMMessage struct {
 }
 
 func (m LGTMMessage) CheckMessage(ctx context.Context, message string) (bool, string) {
-	if strings.Index(strings.ToLower(message), "lgtm") == -1 {
-		return false, message
-	}
-	return true, message
+	return plugins.CheckMessageKeyword(ctx, message, "lgtm")
 }
 
 func (m LGTMMessage) DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool {

@@ -23,7 +23,7 @@ type TiqavImageMessage struct {
 }
 
 func (m TiqavImageMessage) CheckMessage(ctx context.Context, message string) (bool, string) {
-	if strings.Index(strings.ToLower(message), "image me") != -1 {
+	if ok, message := plugins.CheckMessageKeyword(ctx, message, "image me"); ok {
 		word := strings.Replace(strings.ToLower(message), "image me", "", -1)
 		return true, strings.TrimSpace(word)
 	}
