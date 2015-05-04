@@ -1,9 +1,11 @@
 package tiqav
 
 import (
-	"testing"
-	"golang.org/x/net/context"
 	"fmt"
+	"testing"
+
+	"github.com/kyokomi/slackbot/plugins"
+	"golang.org/x/net/context"
 )
 
 func TestCheckMessage(t *testing.T) {
@@ -20,9 +22,11 @@ func TestCheckMessage(t *testing.T) {
 
 func TestDoAction(t *testing.T) {
 	l := TiqavImageMessage{}
-	next := l.DoAction(context.Background(), "gopher", func(message string) {
+	ctx := context.Background()
+	plugins.WithSendMessageFunc(ctx, func(message string) {
 		fmt.Println(message)
 	})
+	next := l.DoAction(ctx, "gopher")
 
 	if next {
 		t.Errorf("ERROR next != false")

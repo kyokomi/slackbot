@@ -30,24 +30,29 @@ func (m TiqavImageMessage) CheckMessage(ctx context.Context, message string) (bo
 	return false, message
 }
 
-func (m TiqavImageMessage) DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool {
+func (m TiqavImageMessage) DoAction(ctx context.Context, message string) bool {
+	imageURL, isNext := getTiqavImageURL(ctx, message)
+
+	plugins.SendMessage(ctx, imageURL)
+
+	return isNext // next stop
+}
+
+func getTiqavImageURL(ctx context.Context, message string) (string, bool) {
 	res, err := http.Get("http://api.tiqav.com/search.json?q=" + message)
 	if err != nil {
-		sendMessageFunc(err.Error())
-		return true
+		return err.Error(), true
 	}
 	defer res.Body.Close()
 
 	j, err := simplejson.NewFromReader(res.Body)
 	if err != nil {
-		sendMessageFunc(err.Error())
-		return true
+		return err.Error(), true
 	}
 
 	array := j.MustArray()
 	if len(array) <= 0 {
-		sendMessageFunc("not images")
-		return true
+		return "not images", true
 	}
 
 	// ランダムに返す
@@ -56,8 +61,7 @@ func (m TiqavImageMessage) DoAction(ctx context.Context, message string, sendMes
 	data := array[idx].(map[string]interface{})
 
 	imageURL := fmt.Sprintf("http://img.tiqav.com/%s.%s", data["id"].(string), data["ext"].(string))
-	sendMessageFunc(imageURL)
-	return false // next stop
+	return imageURL, false
 }
 
 var _ plugins.BotMessagePlugin = (*TiqavImageMessage)(nil)

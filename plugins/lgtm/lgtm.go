@@ -21,27 +21,32 @@ func (m LGTMMessage) CheckMessage(ctx context.Context, message string) (bool, st
 	return plugins.CheckMessageKeyword(ctx, message, "lgtm")
 }
 
-func (m LGTMMessage) DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool {
+func (m LGTMMessage) DoAction(ctx context.Context, message string) bool {
+	sendMessage, isNext := getLGTMImageURL(ctx)
+
+	plugins.SendMessage(ctx, sendMessage)
+
+	return isNext // next stop
+}
+
+func getLGTMImageURL(ctx context.Context) (string, bool) {
 	res, err := http.Get("http://www.lgtm.in/g")
 	if err != nil {
-		sendMessageFunc(err.Error())
-		return true
+		return err.Error(), true
 	}
 	defer res.Body.Close()
 
 	doc, err := goquery.NewDocumentFromResponse(res)
 	if err != nil {
-		sendMessageFunc(err.Error())
-		return true
+		return err.Error(), true
 	}
+
 	text, exists := doc.Find("#imageUrl").Attr("value")
 	if !exists {
-		sendMessageFunc("not exists")
-		return true
+		return "not exists", true
 	}
-	sendMessageFunc(text)
 
-	return false // next stop
+	return text, false
 }
 
 var _ plugins.BotMessagePlugin = (*LGTMMessage)(nil)

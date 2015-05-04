@@ -32,21 +32,21 @@ func init() {
 
 type BotMessagePlugin interface {
 	CheckMessage(ctx context.Context, message string) (bool, string)
-	DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool
+	DoAction(ctx context.Context, message string) bool
 }
 
 func Context() context.Context {
 	return ctx
 }
 
-func ExecPlugins(ctx context.Context, message string, sendMessageFunc func(message string)) {
+func ExecPlugins(ctx context.Context, message string) {
 	for _, p := range plugins {
 		ok, m := p.CheckMessage(ctx, message)
 		if !ok {
 			continue
 		}
 
-		next := p.DoAction(ctx, m, sendMessageFunc)
+		next := p.DoAction(ctx, m)
 		if !next {
 			break
 		}

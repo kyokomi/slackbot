@@ -18,8 +18,8 @@ func (r EchoMessage) CheckMessage(ctx context.Context, message string) (bool, st
 	return true, message
 }
 
-func (r EchoMessage) DoAction(ctx context.Context, message string, sendMessageFunc func(message string)) bool {
-	sendMessageFunc(message)
+func (r EchoMessage) DoAction(ctx context.Context, message string) bool {
+	plugins.SendMessage(ctx, message)
 	return true // next ok
 }
 

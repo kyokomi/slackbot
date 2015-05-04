@@ -17,6 +17,7 @@ func messageResponse(ctx context.Context, msEvent *slack.MessageEvent, sendMessa
 	}
 
 	ctx = slackctx.WithMessageEvent(ctx, msEvent)
+	ctx = plugins.WithSendMessageFunc(ctx, sendMessageFunc)
 
-	plugins.ExecPlugins(ctx, msEvent.Text, sendMessageFunc)
+	plugins.ExecPlugins(ctx, msEvent.Text)
 }
