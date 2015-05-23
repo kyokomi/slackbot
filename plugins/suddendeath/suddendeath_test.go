@@ -10,7 +10,7 @@ import (
 
 func TestCheckMessage(t *testing.T) {
 	l := SuddenDeathMessage{}
-	ok, _ := l.CheckMessage(context.Background(), ">< 突然の死！")
+	ok, _ := l.CheckMessage(context.Background(), "突然の死！")
 	if !ok {
 		t.Errorf("ERROR check = NG")
 	}
@@ -22,7 +22,7 @@ func TestDoAction(t *testing.T) {
 	ctx = plugins.WithSendMessageFunc(ctx, func(message string) {
 		fmt.Println(message)
 	})
-	next := l.DoAction(ctx, ">< 突然の死!")
+	next := l.DoAction(ctx, "突然の死!")
 
 	if next {
 		t.Errorf("ERROR next != false")
