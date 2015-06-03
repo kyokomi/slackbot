@@ -3,6 +3,8 @@ package suddendeath
 import (
 	"strings"
 
+	"unicode/utf8"
+
 	"github.com/kyokomi/slackbot/plugins"
 	"golang.org/x/net/context"
 )
@@ -21,13 +23,14 @@ func (r SuddenDeathMessage) CheckMessage(ctx context.Context, message string) (b
 }
 
 func (r SuddenDeathMessage) DoAction(ctx context.Context, message string) bool {
+	size := utf8.RuneCountInString(message)
 	header := ""
-	for i := 0; i < len(message)/2; i++ {
+	for i := 0; i < size+2; i++ {
 		header += "人"
 	}
 
 	fotter := ""
-	for i := 0; i < len(message)/2; i++ {
+	for i := 0; i < size+2; i++ {
 		fotter += "YY"
 	}
 
