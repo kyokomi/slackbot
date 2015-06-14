@@ -30,15 +30,15 @@ func (r SuddenDeathMessage) DoAction(ctx context.Context, message string) bool {
 	}
 
 	fotter := ""
-	for i := 0; i < size+2; i++ {
-		fotter += "YY"
+	for i := 0; i < size; i++ {
+		fotter += "^Y"
 	}
 
 	reMessage := "＿" + header + "＿"
 	reMessage += "\n"
 	reMessage += "＞　" + message + "　＜"
 	reMessage += "\n"
-	reMessage += "￣" + fotter + "￣"
+	reMessage += "￣Y" + fotter + "￣"
 
 	plugins.SendMessage(ctx, reMessage)
 	return false // next ok
