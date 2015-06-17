@@ -1,0 +1,30 @@
+<%! func PluginTmpl(w io.Writer, pkgName string) error %>package <%= pkgName %>
+
+<%% import "strings" %%>
+
+import (
+	"github.com/kyokomi/slackbot/plugins"
+	"golang.org/x/net/context"
+)
+
+type pluginKey string
+
+func init() {
+	plugins.AddPlugin(pluginKey("<%= pkgName %>Message"), <%= strings.Title(pkgName) %>Message{})
+}
+
+type <%= strings.Title(pkgName) %>Message struct {
+}
+
+func (r <%= strings.Title(pkgName) %>Message) CheckMessage(ctx context.Context, message string) (bool, string) {
+	// TODO: execute message check
+	return true, message
+}
+
+func (r <%= strings.Title(pkgName) %>Message) DoAction(ctx context.Context, message string) bool {
+	// TODO: message action
+	//plugins.SendMessage(ctx, message)
+	return true // next ok
+}
+
+var _ plugins.BotMessagePlugin = (*<%= strings.Title(pkgName) %>Message)(nil)
