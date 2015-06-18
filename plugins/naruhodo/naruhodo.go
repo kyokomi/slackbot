@@ -1,13 +1,27 @@
 package naruhodo
 
 import (
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/kyokomi/slackbot/plugins"
 	"golang.org/x/net/context"
 )
 
 type pluginKey string
+
+var naruhodoMap = []string{
+	"なるほどなるほどですぞ!",
+	"なるほど!",
+	"なるほど?",
+	"なーるほど！",
+	"それはなるほどですね",
+	"なるほど!!",
+	"なるほど!!!",
+}
+
+var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func init() {
 	plugins.AddPlugin(pluginKey("naruhodoMessage"), NaruhodoMessage{})
@@ -21,7 +35,8 @@ func (r NaruhodoMessage) CheckMessage(ctx context.Context, message string) (bool
 }
 
 func (r NaruhodoMessage) DoAction(ctx context.Context, message string) bool {
-	plugins.SendMessage(ctx, "なるほどなるほどですぞ!")
+	idx := int(rd.Int() % len(naruhodoMap))
+	plugins.SendMessage(ctx, naruhodoMap[idx])
 	return false // next ng
 }
 
