@@ -13,6 +13,10 @@ func WithSendMessageFunc(ctx context.Context, sendMessageFunc func(message strin
 }
 
 func SendMessage(ctx context.Context, message string) {
+	if stop {
+		return
+	}
+
 	sendMessageFunc, ok := ctx.Value(sendMessageKey).(func(message string))
 	if ok {
 		sendMessageFunc(message)
