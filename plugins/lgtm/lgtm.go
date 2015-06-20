@@ -29,6 +29,8 @@ func (m LGTMMessage) DoAction(ctx context.Context, message string) bool {
 	return isNext // next stop
 }
 
+var _ plugins.BotMessagePlugin = (*LGTMMessage)(nil)
+
 func getLGTMImageURL(ctx context.Context) (string, bool) {
 	res, err := http.Get("http://www.lgtm.in/g")
 	if err != nil {
@@ -48,5 +50,3 @@ func getLGTMImageURL(ctx context.Context) (string, bool) {
 
 	return text, false
 }
-
-var _ plugins.BotMessagePlugin = (*LGTMMessage)(nil)

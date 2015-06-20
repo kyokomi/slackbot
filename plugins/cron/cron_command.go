@@ -18,7 +18,7 @@ const (
 	ListAction ActionType = "list"
 )
 
-type cronCommand struct {
+type CronCommand struct {
 	Trigger  string // cron
 	Action   ActionType
 	CronSpec string
@@ -31,7 +31,7 @@ func generateCronID() string {
 }
 
 // Scan cron add */1 * * * * * hogehoge -> cronCommand
-func (c *cronCommand) Scan(command string) error {
+func (c *CronCommand) Scan(command string) error {
 	commands := strings.Fields(command)
 	fmt.Println(len(commands), commands)
 	c.Trigger = commands[0] // cron
@@ -65,37 +65,37 @@ func (c *cronCommand) Scan(command string) error {
 	return nil
 }
 
-func (c cronCommand) String() string {
+func (c CronCommand) String() string {
 	return fmt.Sprintf("%s %s %s %s", c.Trigger, c.Action, c.CronSpec, c.Message)
 }
 
-func (c cronCommand) CronKey() string {
+func (c CronCommand) CronKey() string {
 	return c.CronID
 }
 
-func addCronCommand(ctx context.Context, c cronCommand) {
-	startTask(c)
-	refreshCron(ctx)
-	plugins.SendMessage(ctx, fmt.Sprintf("`%s setup done`", c.CronID))
+func addCronCommand(ctx context.Context, channelID string, c CronCommand) {
+	startTask(channelID, c)
+	refreshCron(ctx, channelID)
+	plugins.SendChannelMessage(ctx, channelID, fmt.Sprintf("`%s setup done`", c.CronID))
 }
 
-func delCronCommand(ctx context.Context, c cronCommand) {
-	stopTask(c)
-	refreshCron(ctx)
-	plugins.SendMessage(ctx, fmt.Sprintf("`%s deleted done`", c.CronID))
+func delCronCommand(ctx context.Context, channelID string, c CronCommand) {
+	stopTask(channelID, c)
+	refreshCron(ctx, channelID)
+	plugins.SendChannelMessage(ctx, channelID, fmt.Sprintf("`%s deleted done`", c.CronID))
 }
 
-func listCronCommand(ctx context.Context) {
+func listCronCommand(ctx context.Context, channelID string) {
 	cronSpecMessage := []string{}
-	for _, ccd := range getTaskMap() {
-		if !ccd.active {
+	for _, ccd := range getTaskMap(channelID) {
+		if !ccd.Active {
 			continue
 		}
-		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf("%s message = %s id = %s", ccd.command.CronSpec, ccd.command.Message, ccd.command.CronID))
+		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf("%s message = %s id = %s", ccd.Command.CronSpec, ccd.Command.Message, ccd.Command.CronID))
 	}
 	message := strings.Join(cronSpecMessage, "\n")
 	if message == "" {
 		message = "not cron list"
 	}
-	plugins.SendMessage(ctx, fmt.Sprintf("```\n%s\n```", message))
+	plugins.SendChannelMessage(ctx, channelID, fmt.Sprintf("```\n%s\n```", message))
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/kyokomi/slackbot/plugins"
 	"golang.org/x/net/context"
+	"github.com/kyokomi/slackbot/slackctx"
 )
 
 type pluginKey string
@@ -26,11 +27,9 @@ func (r CronMessage) CheckMessage(ctx context.Context, message string) (bool, st
 }
 
 func (r CronMessage) DoAction(ctx context.Context, message string) bool {
-	if _, ok := cronTaskMap[message]; ok {
-		return false
-	}
+	msEvent := slackctx.FromMessageEvent(ctx)
 
-	c := cronCommand{}
+	c := CronCommand{}
 	if err := c.Scan(message); err != nil {
 		log.Printf("error %s", err)
 		return false
@@ -38,11 +37,11 @@ func (r CronMessage) DoAction(ctx context.Context, message string) bool {
 
 	switch c.Action {
 	case AddAction:
-		addCronCommand(ctx, c)
+		addCronCommand(ctx, msEvent.ChannelId, c)
 	case DelAction:
-		delCronCommand(ctx, c)
+		delCronCommand(ctx, msEvent.ChannelId, c)
 	case ListAction:
-		listCronCommand(ctx)
+		listCronCommand(ctx, msEvent.ChannelId)
 	}
 
 	return false

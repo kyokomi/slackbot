@@ -9,6 +9,7 @@ import (
 	"github.com/kyokomi/slackbot/slackctx"
 	"github.com/nlopes/slack"
 	"golang.org/x/net/context"
+	"github.com/kyokomi/slackbot/plugins"
 )
 
 type BotConfig struct {
@@ -28,7 +29,7 @@ func DefaultConfig() BotConfig {
 	return c
 }
 
-func WebSocketRTM(ctx context.Context, config BotConfig) {
+func WebSocketRTM(ctx context.Context, config BotConfig) context.Context {
 	if config.SlackToken == "" {
 		log.Fatal("ERROR: slack token not found")
 	}
@@ -53,6 +54,13 @@ func WebSocketRTM(ctx context.Context, config BotConfig) {
 			}
 		}
 	}(wsAPI, chSender)
+
+	ctx = plugins.WithSendChannelMessageFunc(ctx, func(channelID, message string) {
+		log.Println("WithSendChannelMessageFunc", channelID, message)
+		if message != "" && channelID != "" {
+			chSender <- *wsAPI.NewOutgoingMessage(message, channelID)
+		}
+	})
 
 	go func(chSender chan slack.OutgoingMessage, chReceiver chan slack.SlackEvent) {
 		for {
@@ -79,9 +87,11 @@ func WebSocketRTM(ctx context.Context, config BotConfig) {
 					error := msg.Data.(*slack.SlackWSError)
 					fmt.Printf("Error: %d - %s\n", error.Code, error.Msg)
 				default:
-					fmt.Printf("Unexpected: %v\n", msg.Data)
+					fmt.Printf("Unexpected: %+v\n", msg.Data)
 				}
 			}
 		}
 	}(chSender, chReceiver)
+
+	return ctx
 }

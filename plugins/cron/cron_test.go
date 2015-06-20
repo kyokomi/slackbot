@@ -8,7 +8,7 @@ import (
 func TestCronCommand(t *testing.T) {
 	command := `cron add */1 * * * * * hogehoge`
 
-	c := cronCommand{}
+	c := CronCommand{}
 	if err := c.Scan(command); err != nil {
 		t.Errorf("error %s", err)
 	}
