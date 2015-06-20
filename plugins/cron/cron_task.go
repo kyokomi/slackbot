@@ -22,6 +22,7 @@ func (c CronTaskMap) AddTask(key string, task CronTask) {
 type CronStore interface {
 	Load() (map[string]CronTaskMap, error)
 	Save(cronTaskMap map[string]CronTaskMap) error
+	Close() error
 }
 
 var (
@@ -29,6 +30,12 @@ var (
 	cronStore   CronStore
 	cronTaskMap = map[string]CronTaskMap{}
 )
+
+func SetupWithRedisStore(ctx context.Context) {
+	Setup()
+	SetupStore(NewHerokuRedisStore())
+	RefreshCron(ctx)
+}
 
 func Setup() {
 	cronClient = map[string]*cron.Cron{}
@@ -51,7 +58,7 @@ func RefreshCron(ctx context.Context) {
 	}
 }
 
-func Stop() {
+func Close() {
 	if cronClient != nil {
 		for _, c := range cronClient {
 			if c == nil {
@@ -59,6 +66,10 @@ func Stop() {
 			}
 			c.Stop()
 		}
+	}
+
+	if cronStore != nil {
+		cronStore.Close()
 	}
 }
 

@@ -21,10 +21,11 @@ type HerokuRedisStore struct {
 	redisDB *redis.Client
 }
 
-func (s HerokuRedisStore) Close() {
+func (s HerokuRedisStore) Close() error {
 	if s.redisDB != nil {
-		s.redisDB.Close()
+		return s.redisDB.Close()
 	}
+	return nil
 }
 
 func NewHerokuRedisStore() HerokuRedisStore {
