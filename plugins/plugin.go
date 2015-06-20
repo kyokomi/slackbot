@@ -60,10 +60,6 @@ func Context() context.Context {
 }
 
 func ExecPlugins(ctx context.Context, message string) {
-	if stop {
-		return
-	}
-
 	for _, p := range plugins {
 		ok, m := p.CheckMessage(ctx, message)
 		if !ok {
