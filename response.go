@@ -11,7 +11,7 @@ func messageResponse(ctx context.Context, msEvent *slack.MessageEvent, sendMessa
 	wsAPI := slackctx.FromSlackRTM(ctx)
 
 	user := wsAPI.GetInfo().User
-	if user.Id == msEvent.UserId {
+	if user.ID == msEvent.BotID {
 		// 自分のやつはスルーする
 		return
 	}

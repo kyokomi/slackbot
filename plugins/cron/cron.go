@@ -37,11 +37,11 @@ func (r CronMessage) DoAction(ctx context.Context, message string) bool {
 
 	switch c.Action {
 	case AddAction:
-		addCronCommand(ctx, msEvent.ChannelId, c)
+		addCronCommand(ctx, msEvent.Channel, c)
 	case DelAction:
-		delCronCommand(ctx, msEvent.ChannelId, c)
+		delCronCommand(ctx, msEvent.Channel, c)
 	case ListAction:
-		listCronCommand(ctx, msEvent.ChannelId)
+		listCronCommand(ctx, msEvent.Channel)
 	}
 
 	return false

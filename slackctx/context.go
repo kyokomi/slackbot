@@ -14,14 +14,14 @@ const (
 )
 
 type SlackClient struct {
-	*slack.Slack
+	*slack.Client
 	Name  string
 	Token string
 }
 
 func NewSlackClient(ctx context.Context, name string, token string) context.Context {
 	c := SlackClient{}
-	c.Slack = slack.New(token)
+	c.Client = slack.New(token)
 	c.Name = name
 	c.Token = token
 	return context.WithValue(ctx, slackClientKey, c)
@@ -33,15 +33,11 @@ func FromSlackClient(ctx context.Context) SlackClient {
 
 func NewSlackRTM(ctx context.Context, protocol, origin string) context.Context {
 	api := FromSlackClient(ctx)
-	wsAPI, err := api.StartRTM(protocol, origin)
-	if err != nil {
-		return ctx
-	}
-	return context.WithValue(ctx, slackRTMKey, wsAPI)
+	return context.WithValue(ctx, slackRTMKey, api.NewRTM())
 }
 
-func FromSlackRTM(ctx context.Context) *slack.SlackWS {
-	return ctx.Value(slackRTMKey).(*slack.SlackWS)
+func FromSlackRTM(ctx context.Context) *slack.RTM {
+	return ctx.Value(slackRTMKey).(*slack.RTM)
 }
 
 func WithMessageEvent(ctx context.Context, msEvent *slack.MessageEvent) context.Context {
