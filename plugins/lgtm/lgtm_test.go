@@ -30,13 +30,13 @@ func TestDoAction(t *testing.T) {
 
 func TestGetLGTMImageURL(t *testing.T) {
 	if message, ok := lgtm.GetLGTMImageURL("hoge"); !ok {
-		t.Errorf("get lgtm image don't error", message)
+		t.Errorf("get lgtm image don't error %s", message)
 	} else {
 		fmt.Println(message)
 	}
 
 	if message, ok := lgtm.GetLGTMImageURL("https://raw.githubusercontent.com/kyokomi/slackbot/master/README.md"); !ok {
-		t.Errorf("get lgtm image don't error", message)
+		t.Errorf("get lgtm image don't error %s", message)
 	} else {
 		fmt.Println(message)
 	}
