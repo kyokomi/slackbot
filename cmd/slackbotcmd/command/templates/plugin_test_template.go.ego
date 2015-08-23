@@ -1,0 +1,31 @@
+<%! func PluginTestTmpl(w io.Writer, pkgName string) error %>package <%= pkgName %>_test
+
+import (
+	"testing"
+
+	"github.com/kyokomi/slackbot/plugins"
+	"github.com/kyokomi/slackbot/plugins/<%= pkgName %>"
+)
+
+var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
+	"test",
+	"#general",
+)
+
+func TestCheckMessage(t *testing.T) {
+	p := <%= pkgName %>.Plugin{}
+	ok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())
+	if !ok {
+		t.Errorf("ERROR check = NG")
+	}
+}
+
+func TestDoAction(t *testing.T) {
+	p := <%= pkgName %>.Plugin{}
+
+	next := p.DoAction(*testEvent, testEvent.BaseText())
+
+	if next != true {
+		t.Errorf("ERROR next != true")
+	}
+}
