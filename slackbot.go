@@ -8,6 +8,7 @@ import (
 	"github.com/nlopes/slack"
 
 	"github.com/kyokomi/slackbot/plugins"
+	"github.com/kyokomi/slackbot/plugins/sysstd"
 )
 
 type BotContext struct {
@@ -25,6 +26,7 @@ func NewBotContext(token string) (*BotContext, error) {
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginsContext(ctx)
+	ctx.AddPlugin("sysstd", sysstd.Plugin{})
 
 	return ctx, nil
 }
@@ -70,12 +72,9 @@ func (ctx *BotContext) WebSocketRTM() {
 }
 
 func (ctx *BotContext) responseEvent(ev *slack.MessageEvent) {
-	user := ctx.RTM.GetInfo().User
-	if user.ID == ev.BotID {
-		// 自分のやつはスルーする
-		return
-	}
-	ctx.Plugins.ExecPlugins(ev.BotID, user.ID, ev.Text, ev.Channel)
+	botUser := ctx.RTM.GetInfo().User
+	log.Println(botUser.ID, ev.User, ev.Text, ev.Channel)
+	ctx.Plugins.ExecPlugins(botUser.ID, botUser.Name, ev.User, ev.Text, ev.Channel)
 }
 
 func (ctx *BotContext) SendMessage(message, channel string) {

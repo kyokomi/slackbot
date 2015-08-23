@@ -3,9 +3,10 @@ package lgtm_test
 import (
 	"testing"
 
+	"fmt"
+
 	"github.com/kyokomi/slackbot/plugins"
 	"github.com/kyokomi/slackbot/plugins/lgtm"
-	"fmt"
 )
 
 var testEvent = plugins.NewTestEvent("LGTM")

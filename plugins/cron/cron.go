@@ -31,13 +31,16 @@ func (p Plugin) DoAction(event plugins.BotEvent, message string) bool {
 		message := p.addCronCommand(event.Channel(), c)
 		p.refreshCron(&event, event.Channel())
 		event.Reply(message)
-	case DelAction, StopAction:
+	case DelAction, DeleteAction, StopAction:
 		message := p.delCronCommand(event.Channel(), c)
 		p.refreshCron(&event, event.Channel())
 		event.Reply(message)
 	case ListAction:
 		message := p.listCronCommand(event.Channel(), c)
 		event.Reply(message)
+	case RefreshAction:
+		p.refreshCron(&event, event.Channel())
+		event.Reply("```\nrefresh ok\n```")
 	case HelpAction:
 		message := p.helpCronCommand(event.Channel(), c)
 		event.Reply(message)

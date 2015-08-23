@@ -114,7 +114,12 @@ func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
 		if !ccd.Active {
 			continue
 		}
-		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf("%s message = %s id = %s", ccd.Command.CronSpec, ccd.Command.Message, ccd.Command.CronID))
+		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf(
+			"cron = [%s] message = [%s] id = [%s]",
+			ccd.Command.CronSpec,
+			ccd.Command.Message,
+			ccd.Command.CronID,
+		))
 	}
 	message := strings.Join(cronSpecMessage, "\n")
 	if message == "" {
@@ -124,7 +129,7 @@ func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
 }
 
 func (ctx *CronContext) helpCronCommand(channel string, _ CronCommand) string {
-	return fmt.Sprintf("```%s```", `
+	return fmt.Sprintf("```\n%s\n```", `
 register:
 	cron add */1 * * * * * hogehoge
 response:

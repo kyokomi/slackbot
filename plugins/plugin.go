@@ -34,8 +34,8 @@ func (ctx *PluginsContext) StartReply() {
 	ctx.IsReply = true
 }
 
-func (ctx *PluginsContext) ExecPlugins(botID, senderID, message, channel string) {
-	e := NewBotEvent(ctx.MessageSender, botID, senderID, message, channel)
+func (ctx *PluginsContext) ExecPlugins(botID, botName, senderID, message, channel string) {
+	e := NewBotEvent(ctx.MessageSender, botID, botName, senderID, message, channel)
 
 	for _, p := range ctx.Plugins {
 		ok, m := p.CheckMessage(*e, message)
@@ -71,18 +71,40 @@ func (p Plugin) Name() string {
 	return fmt.Sprintf("%s", p.Key)
 }
 
-type BotEvent struct {
-	messageSender MessageSender
-	botID         string
-	senderID      string
-	text          string
-	channel       string
+type BotID string
+
+func (b BotID) Equal(bot string) bool {
+	if string(b) == bot {
+		return true
+	}
+
+	if b.LinkID() == bot {
+		return true
+	}
+
+	return false
 }
 
-func NewBotEvent(sender MessageSender, botID, senderID, text, channel string) *BotEvent {
+func (b BotID) LinkID() string {
+	return fmt.Sprintf("<@%s>:", b)
+}
+
+type BotEvent struct {
+	messageSender MessageSender
+
+	botID   BotID
+	botName string
+
+	senderID string
+	text     string
+	channel  string
+}
+
+func NewBotEvent(sender MessageSender, botID, botName, senderID, text, channel string) *BotEvent {
 	return &BotEvent{
 		messageSender: sender,
-		botID:         botID,
+		botID:         BotID(botID),
+		botName:       botName,
 		senderID:      senderID,
 		text:          text,
 		channel:       channel,
@@ -106,7 +128,15 @@ func (b *BotEvent) Channel() string {
 }
 
 func (b *BotEvent) BotID() string {
-	return b.botID
+	return string(b.botID)
+}
+
+func (b *BotEvent) BotName() string {
+	return string(b.botName)
+}
+
+func (b *BotEvent) BotLinkID() string {
+	return b.botID.LinkID()
 }
 
 func (b *BotEvent) SenderID() string {

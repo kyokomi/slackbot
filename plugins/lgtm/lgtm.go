@@ -40,7 +40,7 @@ func GetLGTMImageURL(lgtmURL string) (string, bool) {
 
 	text, exists := doc.Find("#imageUrl").Attr("value")
 	if !exists {
-		return lgtmURL +": not exists", true
+		return lgtmURL + ": not exists", true
 	}
 
 	return text, false
