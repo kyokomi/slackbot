@@ -84,3 +84,5 @@ func (ctx *BotContext) SendMessage(message, channel string) {
 		ctx.RTM.SendMessage(ctx.RTM.NewOutgoingMessage(message, channel))
 	}
 }
+
+var _ plugins.MessageSender = (*BotContext)(nil)

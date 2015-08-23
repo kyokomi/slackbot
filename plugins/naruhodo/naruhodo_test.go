@@ -1,19 +1,19 @@
-package suddendeath_test
+package naruhodo_test
 
 import (
 	"testing"
 
 	"github.com/kyokomi/slackbot/plugins"
-	"github.com/kyokomi/slackbot/plugins/suddendeath"
+	"github.com/kyokomi/slackbot/plugins/naruhodo"
 )
 
 var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"突然の死だああああああああああ！",
+	"それは、なるほど。",
 	"#general",
 )
 
 func TestCheckMessage(t *testing.T) {
-	p := suddendeath.Plugin{}
+	p := naruhodo.Plugin{}
 	ok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())
 	if !ok {
 		t.Errorf("ERROR check = NG")
@@ -21,7 +21,7 @@ func TestCheckMessage(t *testing.T) {
 }
 
 func TestDoAction(t *testing.T) {
-	p := suddendeath.Plugin{}
+	p := naruhodo.Plugin{}
 
 	next := p.DoAction(*testEvent, testEvent.BaseText())
 

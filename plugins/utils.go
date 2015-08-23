@@ -1,6 +1,9 @@
 package plugins
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func CheckMessageKeyword(message string, keyword string) (bool, string) {
 	if strings.Index(strings.ToLower(message), keyword) == -1 {
@@ -8,3 +11,13 @@ func CheckMessageKeyword(message string, keyword string) (bool, string) {
 	}
 	return true, message
 }
+
+type DebugMessageSender struct {
+}
+
+func (b DebugMessageSender) SendMessage(message string, channel string) {
+	fmt.Println(channel)
+	fmt.Println(message)
+}
+
+var _ MessageSender = (*DebugMessageSender)(nil)

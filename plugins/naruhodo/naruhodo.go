@@ -20,17 +20,17 @@ var naruhodoMap = []string{
 
 var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-type NaruhodoMessage struct {
+type Plugin struct {
 }
 
-func (r NaruhodoMessage) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return strings.Index(message, "なるほど") != -1, message
 }
 
-func (r NaruhodoMessage) DoAction(event plugins.BotEvent, message string) bool {
+func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	idx := int(rd.Int() % len(naruhodoMap))
 	event.Reply(naruhodoMap[idx])
 	return false // next ng
 }
 
-var _ plugins.BotMessagePlugin = (*NaruhodoMessage)(nil)
+var _ plugins.BotMessagePlugin = (*Plugin)(nil)

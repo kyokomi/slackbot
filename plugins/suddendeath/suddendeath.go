@@ -7,14 +7,14 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type SuddenDeathMessage struct {
+type Plugin struct {
 }
 
-func (r SuddenDeathMessage) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return strings.Index(message, "突然の") != -1, message
 }
 
-func (r SuddenDeathMessage) DoAction(event plugins.BotEvent, message string) bool {
+func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	size := utf8.RuneCountInString(message)
 	header := ""
 	for i := 0; i < size+2; i++ {
@@ -37,4 +37,4 @@ func (r SuddenDeathMessage) DoAction(event plugins.BotEvent, message string) boo
 	return false // next ok
 }
 
-var _ plugins.BotMessagePlugin = (*SuddenDeathMessage)(nil)
+var _ plugins.BotMessagePlugin = (*Plugin)(nil)

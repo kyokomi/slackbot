@@ -35,7 +35,7 @@ func (ctx *PluginsContext) StartReply() {
 }
 
 func (ctx *PluginsContext) ExecPlugins(message string, channel string) {
-	e := NewBotEvent(ctx, message, channel)
+	e := NewBotEvent(ctx.MessageSender, message, channel)
 
 	for _, p := range ctx.Plugins {
 		ok, m := p.CheckMessage(*e, message)
@@ -72,21 +72,25 @@ func (p Plugin) Name() string {
 }
 
 type BotEvent struct {
-	ctx     *PluginsContext
-	text    string
-	channel string
+	messageSender MessageSender
+	text          string
+	channel       string
 }
 
-func NewBotEvent(ctx *PluginsContext, text, channel string) *BotEvent {
+func NewBotEvent(sender MessageSender, text, channel string) *BotEvent {
 	return &BotEvent{
-		ctx:     ctx,
-		text:    text,
-		channel: channel,
+		messageSender: sender,
+		text:          text,
+		channel:       channel,
 	}
 }
 
 func (b *BotEvent) Reply(message string) {
-	b.ctx.SendMessage(message, b.Channel())
+	b.SendMessage(message, b.Channel())
+}
+
+func (b *BotEvent) SendMessage(message string, channel string) {
+	b.messageSender.SendMessage(message, channel)
 }
 
 func (b *BotEvent) BaseText() string {
@@ -96,3 +100,5 @@ func (b *BotEvent) BaseText() string {
 func (b *BotEvent) Channel() string {
 	return b.channel
 }
+
+var _ MessageSender = (*BotEvent)(nil)

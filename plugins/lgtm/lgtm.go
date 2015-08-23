@@ -7,14 +7,14 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type LGTMMessage struct {
+type Plugin struct {
 }
 
-func (m LGTMMessage) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
+func (m Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
 	return plugins.CheckMessageKeyword(message, "lgtm")
 }
 
-func (m LGTMMessage) DoAction(event plugins.BotEvent, message string) bool {
+func (m Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	sendMessage, isNext := getLGTMImageURL()
 
 	event.Reply(sendMessage)
@@ -22,7 +22,7 @@ func (m LGTMMessage) DoAction(event plugins.BotEvent, message string) bool {
 	return isNext // next stop
 }
 
-var _ plugins.BotMessagePlugin = (*LGTMMessage)(nil)
+var _ plugins.BotMessagePlugin = (*Plugin)(nil)
 
 func getLGTMImageURL() (string, bool) {
 	res, err := http.Get("http://www.lgtm.in/g")
