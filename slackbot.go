@@ -75,7 +75,7 @@ func (ctx *BotContext) responseEvent(ev *slack.MessageEvent) {
 		// 自分のやつはスルーする
 		return
 	}
-	ctx.Plugins.ExecPlugins(ev.Text, ev.Channel)
+	ctx.Plugins.ExecPlugins(ev.BotID, user.ID, ev.Text, ev.Channel)
 }
 
 func (ctx *BotContext) SendMessage(message, channel string) {

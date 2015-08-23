@@ -8,6 +8,8 @@ import (
 )
 
 var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
+	"bot",
+	"user",
 	"突然の死だああああああああああ！",
 	"#general",
 )

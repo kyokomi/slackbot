@@ -28,8 +28,8 @@ func (s HerokuRedisRepository) Close() error {
 	return nil
 }
 
-func NewHerokuRedisRepository() HerokuRedisRepository {
-	s := HerokuRedisRepository{}
+func NewHerokuRedisRepository() CronRepository {
+	s := &HerokuRedisRepository{}
 	s.redisDB = goroku.MustRedis(goroku.OpenRedis(context.Background()))
 	return s
 }

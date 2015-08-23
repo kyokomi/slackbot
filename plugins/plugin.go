@@ -34,8 +34,8 @@ func (ctx *PluginsContext) StartReply() {
 	ctx.IsReply = true
 }
 
-func (ctx *PluginsContext) ExecPlugins(message string, channel string) {
-	e := NewBotEvent(ctx.MessageSender, message, channel)
+func (ctx *PluginsContext) ExecPlugins(botID, senderID, message, channel string) {
+	e := NewBotEvent(ctx.MessageSender, botID, senderID, message, channel)
 
 	for _, p := range ctx.Plugins {
 		ok, m := p.CheckMessage(*e, message)
@@ -73,13 +73,17 @@ func (p Plugin) Name() string {
 
 type BotEvent struct {
 	messageSender MessageSender
+	botID         string
+	senderID      string
 	text          string
 	channel       string
 }
 
-func NewBotEvent(sender MessageSender, text, channel string) *BotEvent {
+func NewBotEvent(sender MessageSender, botID, senderID, text, channel string) *BotEvent {
 	return &BotEvent{
 		messageSender: sender,
+		botID:         botID,
+		senderID:      senderID,
 		text:          text,
 		channel:       channel,
 	}
@@ -99,6 +103,14 @@ func (b *BotEvent) BaseText() string {
 
 func (b *BotEvent) Channel() string {
 	return b.channel
+}
+
+func (b *BotEvent) BotID() string {
+	return b.botID
+}
+
+func (b *BotEvent) SenderID() string {
+	return b.senderID
 }
 
 var _ MessageSender = (*BotEvent)(nil)
