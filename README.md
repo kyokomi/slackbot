@@ -2,6 +2,7 @@ slackbot
 ========================
 
 [![Circle CI](https://circleci.com/gh/kyokomi/slackbot.svg?style=svg)](https://circleci.com/gh/kyokomi/slackbot)
+[![Coverage Status](https://coveralls.io/repos/kyokomi/slackbot/badge.svg?branch=master&service=github)](https://coveralls.io/github/kyokomi/slackbot?branch=master)
 
 Plugin extension a simple slack bot for golang.
 
