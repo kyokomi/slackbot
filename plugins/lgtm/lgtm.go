@@ -10,12 +10,14 @@ import (
 type Plugin struct {
 }
 
+const lgtmURL = "http://www.lgtm.in/g"
+
 func (m Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
 	return plugins.CheckMessageKeyword(message, "lgtm")
 }
 
 func (m Plugin) DoAction(event plugins.BotEvent, message string) bool {
-	sendMessage, isNext := getLGTMImageURL()
+	sendMessage, isNext := GetLGTMImageURL(lgtmURL)
 
 	event.Reply(sendMessage)
 
@@ -24,8 +26,8 @@ func (m Plugin) DoAction(event plugins.BotEvent, message string) bool {
 
 var _ plugins.BotMessagePlugin = (*Plugin)(nil)
 
-func getLGTMImageURL() (string, bool) {
-	res, err := http.Get("http://www.lgtm.in/g")
+func GetLGTMImageURL(lgtmURL string) (string, bool) {
+	res, err := http.Get(lgtmURL)
 	if err != nil {
 		return err.Error(), true
 	}
@@ -38,7 +40,7 @@ func getLGTMImageURL() (string, bool) {
 
 	text, exists := doc.Find("#imageUrl").Attr("value")
 	if !exists {
-		return "not exists", true
+		return lgtmURL +": not exists", true
 	}
 
 	return text, false

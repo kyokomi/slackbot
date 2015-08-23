@@ -7,10 +7,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins/<%= pkgName %>"
 )
 
-var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"test",
-	"#general",
-)
+var testEvent = plugins.NewTestEvent("test")
 
 func TestCheckMessage(t *testing.T) {
 	p := <%= pkgName %>.Plugin{}

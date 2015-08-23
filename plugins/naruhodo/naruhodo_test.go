@@ -7,12 +7,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins/naruhodo"
 )
 
-var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"bot",
-	"user",
-	"それは、なるほど。",
-	"#general",
-)
+var testEvent = plugins.NewTestEvent("それは、なるほど")
 
 func TestCheckMessage(t *testing.T) {
 	p := naruhodo.Plugin{}

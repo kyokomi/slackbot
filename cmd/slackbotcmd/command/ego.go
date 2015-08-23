@@ -28,14 +28,14 @@ _, _ = fmt.Fprint(w, "_test\n\nimport (\n\t\"testing\"\n\n\t\"github.com/kyokomi
 //line command/templates/plugin_test_template.go.ego:7
 _, _ = fmt.Fprint(w, html.EscapeString(fmt.Sprintf("%v",  pkgName )))
 //line command/templates/plugin_test_template.go.ego:7
-_, _ = fmt.Fprint(w, "\"\n)\n\nvar testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},\n\t\"test\",\n\t\"#general\",\n)\n\nfunc TestCheckMessage(t *testing.T) {\n\tp := ")
-//line command/templates/plugin_test_template.go.ego:16
+_, _ = fmt.Fprint(w, "\"\n)\n\nvar testEvent = plugins.NewTestEvent(\"test\")\n\nfunc TestCheckMessage(t *testing.T) {\n\tp := ")
+//line command/templates/plugin_test_template.go.ego:13
 _, _ = fmt.Fprint(w, html.EscapeString(fmt.Sprintf("%v",  pkgName )))
-//line command/templates/plugin_test_template.go.ego:16
+//line command/templates/plugin_test_template.go.ego:13
 _, _ = fmt.Fprint(w, ".Plugin{}\n\tok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())\n\tif !ok {\n\t\tt.Errorf(\"ERROR check = NG\")\n\t}\n}\n\nfunc TestDoAction(t *testing.T) {\n\tp := ")
-//line command/templates/plugin_test_template.go.ego:24
+//line command/templates/plugin_test_template.go.ego:21
 _, _ = fmt.Fprint(w, html.EscapeString(fmt.Sprintf("%v",  pkgName )))
-//line command/templates/plugin_test_template.go.ego:24
+//line command/templates/plugin_test_template.go.ego:21
 _, _ = fmt.Fprint(w, ".Plugin{}\n\n\tnext := p.DoAction(*testEvent, testEvent.BaseText())\n\n\tif next != true {\n\t\tt.Errorf(\"ERROR next != true\")\n\t}\n}\n")
 return nil
 }

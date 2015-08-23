@@ -7,12 +7,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins/echo"
 )
 
-var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"bot",
-	"user",
-	"それは、なるほど。",
-	"#general",
-)
+var testEvent = plugins.NewTestEvent("てすと")
 
 func TestCheckMessage(t *testing.T) {
 	p := echo.Plugin{}

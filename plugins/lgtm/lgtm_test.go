@@ -5,14 +5,10 @@ import (
 
 	"github.com/kyokomi/slackbot/plugins"
 	"github.com/kyokomi/slackbot/plugins/lgtm"
+	"fmt"
 )
 
-var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"bot",
-	"user",
-	"LGTM",
-	"#general",
-)
+var testEvent = plugins.NewTestEvent("LGTM")
 
 func TestCheckMessage(t *testing.T) {
 	p := lgtm.Plugin{}
@@ -29,5 +25,19 @@ func TestDoAction(t *testing.T) {
 
 	if next != false {
 		t.Errorf("ERROR next != false")
+	}
+}
+
+func TestGetLGTMImageURL(t *testing.T) {
+	if message, ok := lgtm.GetLGTMImageURL("hoge"); !ok {
+		t.Errorf("get lgtm image don't error", message)
+	} else {
+		fmt.Println(message)
+	}
+
+	if message, ok := lgtm.GetLGTMImageURL("https://raw.githubusercontent.com/kyokomi/slackbot/master/README.md"); !ok {
+		t.Errorf("get lgtm image don't error", message)
+	} else {
+		fmt.Println(message)
 	}
 }

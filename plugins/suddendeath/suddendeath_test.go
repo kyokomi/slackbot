@@ -7,12 +7,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins/suddendeath"
 )
 
-var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
-	"bot",
-	"user",
-	"突然の死だああああああああああ！",
-	"#general",
-)
+var testEvent = plugins.NewTestEvent("突然の死だああああああああああ！")
 
 func TestCheckMessage(t *testing.T) {
 	p := suddendeath.Plugin{}
