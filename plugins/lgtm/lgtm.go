@@ -5,33 +5,26 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kyokomi/slackbot/plugins"
-	"golang.org/x/net/context"
 )
-
-type pluginKey string
-
-func init() {
-	plugins.AddPlugin(pluginKey("lgtm"), LGTMMessage{})
-}
 
 type LGTMMessage struct {
 }
 
-func (m LGTMMessage) CheckMessage(ctx context.Context, message string) (bool, string) {
-	return plugins.CheckMessageKeyword(ctx, message, "lgtm")
+func (m LGTMMessage) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
+	return plugins.CheckMessageKeyword(message, "lgtm")
 }
 
-func (m LGTMMessage) DoAction(ctx context.Context, message string) bool {
-	sendMessage, isNext := getLGTMImageURL(ctx)
+func (m LGTMMessage) DoAction(event plugins.BotEvent, message string) bool {
+	sendMessage, isNext := getLGTMImageURL()
 
-	plugins.SendMessage(ctx, sendMessage)
+	event.Reply(sendMessage)
 
 	return isNext // next stop
 }
 
 var _ plugins.BotMessagePlugin = (*LGTMMessage)(nil)
 
-func getLGTMImageURL(ctx context.Context) (string, bool) {
+func getLGTMImageURL() (string, bool) {
 	res, err := http.Get("http://www.lgtm.in/g")
 	if err != nil {
 		return err.Error(), true
