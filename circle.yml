@@ -1,0 +1,17 @@
+checkout:
+  post:
+    # circleci golang gopath something ...
+    - rm -rf $HOME/.go_workspace/src/github.com/kyokomi/*
+    - mkdir -p $HOME/.go_workspace/src/github.com/kyokomi
+    - ln -snf $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_workspace/src/github.com/kyokomi
+
+test:
+  pre:
+    - go get golang.org/x/tools/cmd/cover
+    - go get github.com/mattn/goveralls
+  post:
+    - go vet ./...
+    # circleci golang all coverage something ...
+    - sh ./circleci/test/post/gocoverage_all.sh:
+        pwd: ../../../../../.go_workspace/src/github.com/kyokomi/$CIRCLE_PROJECT_REPONAME
+    - goveralls -coverprofile=.profile.cov -service=circle-ci -repotoken $COVERALLS_TOKEN

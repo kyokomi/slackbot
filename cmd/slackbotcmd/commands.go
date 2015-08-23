@@ -15,8 +15,8 @@ var Commands = []cli.Command{
 		Name:   "new",
 		Usage:  "",
 		Action: command.CmdNew,
-		Flags:  []cli.Flag{
-			cli.StringFlag{"pkg", "", "package name", ""},
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "pkg", Value: "", Usage: "package name", EnvVar: ""},
 		},
 	},
 }

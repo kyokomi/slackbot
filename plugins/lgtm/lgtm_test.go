@@ -1,30 +1,33 @@
-package lgtm
+package lgtm_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kyokomi/slackbot/plugins"
-	"golang.org/x/net/context"
+	"github.com/kyokomi/slackbot/plugins/lgtm"
+)
+
+var testEvent = plugins.NewBotEvent(plugins.DebugMessageSender{},
+	"bot",
+	"user",
+	"LGTM",
+	"#general",
 )
 
 func TestCheckMessage(t *testing.T) {
-	l := LGTMMessage{}
-	ok, _ := l.CheckMessage(context.Background(), "hoge LGTM desu.")
+	p := lgtm.Plugin{}
+	ok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())
 	if !ok {
 		t.Errorf("ERROR check = NG")
 	}
 }
 
 func TestDoAction(t *testing.T) {
-	l := LGTMMessage{}
-	ctx := context.Background()
-	ctx = plugins.WithSendMessageFunc(ctx, func(message string) {
-		fmt.Println(message)
-	})
-	next := l.DoAction(ctx, "hoge")
+	p := lgtm.Plugin{}
 
-	if next {
+	next := p.DoAction(*testEvent, testEvent.BaseText())
+
+	if next != false {
 		t.Errorf("ERROR next != false")
 	}
 }

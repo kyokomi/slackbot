@@ -6,9 +6,7 @@ import (
 	"os"
 
 	"github.com/kyokomi/slackbot"
-	"github.com/kyokomi/slackbot/plugins"
-
-	_ "github.com/kyokomi/slackbot/plugins/echo"
+	"github.com/kyokomi/slackbot/plugins/echo"
 )
 
 func main() {
@@ -16,13 +14,13 @@ func main() {
 	flag.StringVar(&token, "token", os.Getenv("SLACK_BOT_TOKEN"), "SlackのBotToken")
 	flag.Parse()
 
-	c := slackbot.DefaultConfig()
-	c.Name = "<bot name>"
-	c.SlackToken = token
+	bot, err := slackbot.NewBotContext(token)
+	if err != nil {
+		panic(err)
+	}
+	bot.AddPlugin("echo", echo.Plugin{})
 
-	ctx := plugins.Context()
-
-	slackbot.WebSocketRTM(ctx, c)
+	bot.WebSocketRTM()
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))

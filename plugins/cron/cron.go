@@ -5,20 +5,13 @@ import (
 	"strings"
 
 	"github.com/kyokomi/slackbot/plugins"
-	"golang.org/x/net/context"
-	"github.com/kyokomi/slackbot/slackctx"
 )
 
-type pluginKey string
-
-func init() {
-	plugins.AddPlugin(pluginKey("cronMessage"), CronMessage{})
+type Plugin struct {
+	*CronContext
 }
 
-type CronMessage struct {
-}
-
-func (r CronMessage) CheckMessage(ctx context.Context, message string) (bool, string) {
+func (p Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	// cron [action] [cron] [message]
 	if strings.HasPrefix(message, "cron") {
 		return true, message
@@ -26,9 +19,7 @@ func (r CronMessage) CheckMessage(ctx context.Context, message string) (bool, st
 	return false, message
 }
 
-func (r CronMessage) DoAction(ctx context.Context, message string) bool {
-	msEvent := slackctx.FromMessageEvent(ctx)
-
+func (p Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	c := CronCommand{}
 	if err := c.Scan(message); err != nil {
 		log.Printf("error %s", err)
@@ -37,14 +28,21 @@ func (r CronMessage) DoAction(ctx context.Context, message string) bool {
 
 	switch c.Action {
 	case AddAction:
-		addCronCommand(ctx, msEvent.Channel, c)
-	case DelAction:
-		delCronCommand(ctx, msEvent.Channel, c)
+		message := p.addCronCommand(event.Channel(), c)
+		p.refreshCron(&event, event.Channel())
+		event.Reply(message)
+	case DelAction, StopAction:
+		message := p.delCronCommand(event.Channel(), c)
+		p.refreshCron(&event, event.Channel())
+		event.Reply(message)
 	case ListAction:
-		listCronCommand(ctx, msEvent.Channel)
+		message := p.listCronCommand(event.Channel(), c)
+		event.Reply(message)
+	case HelpAction:
+		message := p.helpCronCommand(event.Channel(), c)
+		event.Reply(message)
 	}
-
 	return false
 }
 
-var _ plugins.BotMessagePlugin = (*CronMessage)(nil)
+var _ plugins.BotMessagePlugin = (*Plugin)(nil)

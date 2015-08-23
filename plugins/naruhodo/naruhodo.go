@@ -6,10 +6,7 @@ import (
 	"time"
 
 	"github.com/kyokomi/slackbot/plugins"
-	"golang.org/x/net/context"
 )
-
-type pluginKey string
 
 var naruhodoMap = []string{
 	"なるほどなるほどですぞ!",
@@ -23,21 +20,17 @@ var naruhodoMap = []string{
 
 var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func init() {
-	plugins.AddPlugin(pluginKey("naruhodoMessage"), NaruhodoMessage{})
+type Plugin struct {
 }
 
-type NaruhodoMessage struct {
-}
-
-func (r NaruhodoMessage) CheckMessage(ctx context.Context, message string) (bool, string) {
+func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return strings.Index(message, "なるほど") != -1, message
 }
 
-func (r NaruhodoMessage) DoAction(ctx context.Context, message string) bool {
+func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	idx := int(rd.Int() % len(naruhodoMap))
-	plugins.SendMessage(ctx, naruhodoMap[idx])
+	event.Reply(naruhodoMap[idx])
 	return false // next ng
 }
 
-var _ plugins.BotMessagePlugin = (*NaruhodoMessage)(nil)
+var _ plugins.BotMessagePlugin = (*Plugin)(nil)
