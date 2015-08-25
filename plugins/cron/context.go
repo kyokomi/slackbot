@@ -117,7 +117,7 @@ func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
 		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf(
 			"cron = [%s] message = [%s] id = [%s]",
 			ccd.Command.CronSpec,
-			ccd.Command.Message,
+			ccd.Command.Message(),
 			ccd.Command.CronID,
 		))
 	}
