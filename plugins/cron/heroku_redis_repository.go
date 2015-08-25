@@ -55,6 +55,8 @@ func (s HerokuRedisRepository) Load() (map[string]CronTaskMap, error) {
 				continue
 			}
 
+			log.Printf("%#v\n", task)
+
 			if !task.Active {
 				continue
 			}
