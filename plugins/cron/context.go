@@ -63,7 +63,7 @@ func (ctx *CronContext) refreshCron(messageSender plugins.MessageSender, channel
 			continue
 		}
 
-		message := activeCron.Command.Message
+		message := activeCron.Command.Message()
 		c.AddFunc(activeCron.Command.CronSpec, func() {
 			messageSender.SendMessage(message, channel)
 		})
