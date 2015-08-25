@@ -3,6 +3,8 @@ package cron
 import (
 	"log"
 	"strings"
+	"fmt"
+	"os/exec"
 
 	"github.com/kyokomi/slackbot/plugins"
 )
@@ -41,6 +43,13 @@ func (p Plugin) DoAction(event plugins.BotEvent, message string) bool {
 	case RefreshAction:
 		p.refreshCron(&event, event.Channel())
 		event.Reply("```\nrefresh ok\n```")
+	case CommandAction:
+		data, err := exec.Command(c.Args[0], c.Args[1:]...).CombinedOutput()
+		if err != nil {
+			event.Reply(fmt.Sprintf("`%s`", err.Error()))
+		} else {
+			event.Reply(fmt.Sprintf("```\n%s```", string(data)))
+		}
 	case HelpAction:
 		message := p.helpCronCommand(event.Channel(), c)
 		event.Reply(message)
