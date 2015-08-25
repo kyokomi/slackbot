@@ -24,12 +24,12 @@ type CronCommand struct {
 	Trigger  string // cron
 	Action   ActionType
 	CronSpec string
-	Args     []string
+	Message string
 	CronID   string
 }
 
-func (c CronCommand) Message() string {
-	return strings.Join(c.Args, " ")
+func (c CronCommand) Args() []string {
+	return strings.Fields(c.Message)
 }
 
 func generateCronID() string {
@@ -51,7 +51,7 @@ func (c *CronCommand) Scan(command string) error {
 		}
 
 		c.CronSpec = strings.Join(commands[2:8], " ")
-		c.Args = commands[8:]
+		c.Message = strings.Join(commands[8:], " ")
 		c.CronID = generateCronID()
 
 	case DelAction, DeleteAction, StopAction:
@@ -78,7 +78,7 @@ func (c *CronCommand) Scan(command string) error {
 		if len(commands) < 3 {
 			return fmt.Errorf("commands length error %d", len(commands))
 		}
-		c.Args = commands[2:]
+		c.Message = strings.Join(commands[2:], " ")
 
 	case HelpAction:
 		// cron help
@@ -91,7 +91,7 @@ func (c *CronCommand) Scan(command string) error {
 }
 
 func (c CronCommand) String() string {
-	return fmt.Sprintf("%s %s %s %s", c.Trigger, c.Action, c.CronSpec, c.Message())
+	return fmt.Sprintf("%s %s %s %s", c.Trigger, c.Action, c.CronSpec, c.Message)
 }
 
 func (c CronCommand) CronKey() string {
