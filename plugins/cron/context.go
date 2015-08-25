@@ -63,7 +63,7 @@ func (ctx *CronContext) refreshCron(messageSender plugins.MessageSender, channel
 			continue
 		}
 
-		message := activeCron.Command.Message()
+		message := activeCron.Command.Message
 		c.AddFunc(activeCron.Command.CronSpec, func() {
 			messageSender.SendMessage(message, channel)
 		})
@@ -117,7 +117,7 @@ func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
 		cronSpecMessage = append(cronSpecMessage, fmt.Sprintf(
 			"cron = [%s] message = [%s] id = [%s]",
 			ccd.Command.CronSpec,
-			ccd.Command.Message(),
+			ccd.Command.Message,
 			ccd.Command.CronID,
 		))
 	}
