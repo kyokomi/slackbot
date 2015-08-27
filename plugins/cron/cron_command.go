@@ -10,14 +10,14 @@ import (
 type ActionType string
 
 const (
-	AddAction     ActionType = "add"
-	DelAction     ActionType = "del"
-	DeleteAction  ActionType = "delete"
-	StopAction    ActionType = "stop"
-	ListAction    ActionType = "list"
-	RefreshAction ActionType = "refresh"
-	CommandAction ActionType = "command"
-	HelpAction    ActionType = "help"
+	AddAction       ActionType = "add"
+	RandomAddAction ActionType = "random"
+	DelAction       ActionType = "del"
+	DeleteAction    ActionType = "delete"
+	StopAction      ActionType = "stop"
+	ListAction      ActionType = "list"
+	RefreshAction   ActionType = "refresh"
+	HelpAction      ActionType = "help"
 )
 
 type CronCommand struct {
@@ -44,46 +44,22 @@ func (c *CronCommand) Scan(command string) error {
 	c.Action = ActionType(commands[1])
 
 	switch c.Action {
-	case AddAction:
+	case AddAction, RandomAddAction:
 		// cron add 1 * * * * * hogehoge
 		if len(commands) < 9 {
 			return fmt.Errorf("commands length error %d", len(commands))
 		}
-
 		c.CronSpec = strings.Join(commands[2:8], " ")
 		c.Args = commands[8:]
 		c.CronID = generateCronID()
-
 	case DelAction, DeleteAction, StopAction:
 		// cron del <cron_id>
 		if len(commands) != 3 {
 			return fmt.Errorf("commands length error %d", len(commands))
 		}
 		c.CronID = commands[2]
-
-	case ListAction:
+	case ListAction, RefreshAction, HelpAction:
 		// cron list
-		if len(commands) != 2 {
-			return fmt.Errorf("commands length error %d", len(commands))
-		}
-
-	case RefreshAction:
-		// cron refresh
-		if len(commands) != 2 {
-			return fmt.Errorf("commands length error %d", len(commands))
-		}
-
-	case CommandAction:
-		// cron command ls -al
-		if len(commands) < 3 {
-			return fmt.Errorf("commands length error %d", len(commands))
-		}
-		c.CronSpec = strings.Join(commands[2:8], " ")
-		c.Args = commands[8:]
-		c.CronID = generateCronID()
-
-	case HelpAction:
-		// cron help
 		if len(commands) != 2 {
 			return fmt.Errorf("commands length error %d", len(commands))
 		}

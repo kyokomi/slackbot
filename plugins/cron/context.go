@@ -3,11 +3,15 @@ package cron
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/kyokomi/slackbot/plugins"
 	"github.com/robfig/cron"
 )
+
+var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 type CronContext struct {
 	repository  CronRepository
@@ -63,8 +67,15 @@ func (ctx *CronContext) refreshCron(messageSender plugins.MessageSender, channel
 			continue
 		}
 
-		message := activeCron.Command.Message()
+		cmd := activeCron.Command
 		c.AddFunc(activeCron.Command.CronSpec, func() {
+			message := cmd.Message()
+			switch cmd.Action {
+			case RandomAddAction:
+				idx := rd.Intn(len(cmd.Args) - 1)
+				log.Println(len(cmd.Args), idx, cmd.Args[idx])
+				message = cmd.Args[idx]
+			}
 			messageSender.SendMessage(message, channel)
 		})
 	}
