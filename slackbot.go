@@ -12,7 +12,7 @@ import (
 )
 
 type BotContext struct {
-	Plugins *plugins.PluginsContext
+	Plugins plugins.PluginManager
 	Client  *slack.Client
 	RTM     *slack.RTM
 }
@@ -25,7 +25,7 @@ func NewBotContext(token string) (*BotContext, error) {
 	ctx := &BotContext{}
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
-	ctx.Plugins = plugins.NewPluginsContext(ctx)
+	ctx.Plugins = plugins.NewPluginManager(ctx)
 	ctx.AddPlugin("sysstd", sysstd.Plugin{})
 
 	return ctx, nil
@@ -73,11 +73,15 @@ func (ctx *BotContext) WebSocketRTM() {
 
 func (ctx *BotContext) responseEvent(ev *slack.MessageEvent) {
 	botUser := ctx.RTM.GetInfo().User
-	log.Println(botUser.ID, ev.User, ev.Text, ev.Channel)
-	ctx.Plugins.ExecPlugins(botUser.ID, botUser.Name, ev.User, ev.Text, ev.Channel)
+
+	e := plugins.NewBotEvent(ctx, botUser.ID, botUser.Name, ev.User, ev.Username, ev.Text, ev.Channel)
+	ctx.Plugins.ExecPlugins(e)
 }
 
 func (ctx *BotContext) SendMessage(message, channel string) {
+	if !ctx.Plugins.IsReply() {
+		return
+	}
 	log.Println("WithSendChannelMessageFunc", channel, message)
 	if message != "" && channel != "" {
 		ctx.RTM.SendMessage(ctx.RTM.NewOutgoingMessage(message, channel))
