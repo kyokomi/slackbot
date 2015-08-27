@@ -3,6 +3,7 @@ package sysstd
 import (
 	"fmt"
 	"log"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -23,6 +24,13 @@ func (p Plugin) SetTimezone(tmText string) {
 
 func (p Plugin) ExecuteCommand(args ...string) string {
 	switch {
+	case execCommand.Contains(args[0]):
+		data, err := exec.Command(args[1], args[2:]...).CombinedOutput()
+		if err != nil {
+			return fmt.Sprintf("`%s`", err.Error())
+		} else {
+			return fmt.Sprintf("```\n%s```", string(data))
+		}
 	case dateCommand.Contains(args[0]):
 		return time.Now().Format(defaultTimeFormat)
 	case setTimezoneCommand.Contains(args[0]):

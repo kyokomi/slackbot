@@ -21,9 +21,11 @@ type commands []string
 var (
 	dateCommand        commands = []string{"dateCommand", "date"}
 	setTimezoneCommand commands = []string{"setTimezoneCommand", "timezone"}
+	execCommand        commands = []string{"command", "cmd", "exec"}
 	commandList                 = map[string]commands{
 		dateCommand[0]:        dateCommand,
 		setTimezoneCommand[0]: setTimezoneCommand,
+		execCommand[0]:        execCommand,
 	}
 )
 
