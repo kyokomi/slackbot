@@ -25,6 +25,9 @@ func (p Plugin) SetTimezone(tmText string) {
 func (p Plugin) ExecuteCommand(args ...string) string {
 	switch {
 	case execCommand.Contains(args[0]):
+		if len(args) < 3 {
+			return "command not found"
+		}
 		data, err := exec.Command(args[1], args[2:]...).CombinedOutput()
 		if err != nil {
 			return fmt.Sprintf("`%s`", err.Error())
@@ -58,6 +61,10 @@ func (r Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, stri
 	} else if strings.HasPrefix(message, event.BotID()) {
 		cmdArgs = strings.Fields(message[len(event.BotID()):])
 	} else {
+		return false, message
+	}
+
+	if len(cmdArgs) < 1 {
 		return false, message
 	}
 

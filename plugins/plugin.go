@@ -1,60 +1,72 @@
 package plugins
 
-import (
-	"fmt"
-)
+import "fmt"
 
-type PluginsContext struct {
-	Plugins       []Plugin
-	IsReply       bool
-	MessageSender MessageSender
+type PluginManager interface {
+	AddPlugin(key interface{}, val BotMessagePlugin)
+	ExecPlugins(botEvent BotEvent)
+	StopReply()
+	StartReply()
+	IsReply() bool
+	GetPlugins() []Plugin
 }
+
+type plugins struct {
+	plugins       []Plugin
+	isReply       bool
+	messageSender MessageSender
+}
+
+var _ PluginManager = (*plugins)(nil)
 
 type MessageSender interface {
 	SendMessage(message string, channel string)
 }
 
-func NewPluginsContext(sender MessageSender) *PluginsContext {
-	return &PluginsContext{
-		Plugins:       []Plugin{},
-		IsReply:       true,
-		MessageSender: sender,
+func NewPluginManager(sender MessageSender) PluginManager {
+	return &plugins{
+		plugins:       []Plugin{},
+		isReply:       true,
+		messageSender: sender,
 	}
 }
 
-func (ctx *PluginsContext) AddPlugin(key interface{}, val BotMessagePlugin) {
-	ctx.Plugins = append(ctx.Plugins, Plugin{key, val})
+func (ps *plugins) AddPlugin(key interface{}, val BotMessagePlugin) {
+	ps.plugins = append(ps.plugins, Plugin{key, val})
 }
 
-func (ctx *PluginsContext) StopReply() {
-	ctx.IsReply = false
+func (ps *plugins) StopReply() {
+	ps.isReply = false
 }
 
-func (ctx *PluginsContext) StartReply() {
-	ctx.IsReply = true
+func (ps *plugins) StartReply() {
+	ps.isReply = true
 }
 
-func (ctx *PluginsContext) ExecPlugins(botID, botName, senderID, message, channel string) {
-	e := NewBotEvent(ctx.MessageSender, botID, botName, senderID, message, channel)
+func (ps *plugins) IsReply() bool {
+	return ps.isReply
+}
 
-	for _, p := range ctx.Plugins {
-		ok, m := p.CheckMessage(*e, message)
+func (ps *plugins) ExecPlugins(botEvent BotEvent) {
+	for _, p := range ps.plugins {
+		ok, m := p.CheckMessage(botEvent, botEvent.text)
 		if !ok {
 			continue
 		}
 
-		next := p.DoAction(*e, m)
+		next := p.DoAction(botEvent, m)
 		if !next {
 			break
 		}
 	}
 }
 
-func (ctx *PluginsContext) SendMessage(message string, channel string) {
-	if !ctx.IsReply {
-		return
-	}
-	ctx.MessageSender.SendMessage(message, channel)
+func (ps *plugins) SendMessage(message string, channel string) {
+	ps.messageSender.SendMessage(message, channel)
+}
+
+func (ps *plugins) GetPlugins() []Plugin {
+	return ps.plugins
 }
 
 type BotMessagePlugin interface {
@@ -95,17 +107,21 @@ type BotEvent struct {
 	botID   BotID
 	botName string
 
-	senderID string
-	text     string
-	channel  string
+	senderID   string
+	senderName string
+	text       string
+	channel    string
 }
 
-func NewBotEvent(sender MessageSender, botID, botName, senderID, text, channel string) *BotEvent {
-	return &BotEvent{
+var _ MessageSender = (*BotEvent)(nil)
+
+func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, text, channel string) BotEvent {
+	return BotEvent{
 		messageSender: sender,
 		botID:         BotID(botID),
 		botName:       botName,
 		senderID:      senderID,
+		senderName:    senderName,
 		text:          text,
 		channel:       channel,
 	}
@@ -143,4 +159,6 @@ func (b *BotEvent) SenderID() string {
 	return b.senderID
 }
 
-var _ MessageSender = (*BotEvent)(nil)
+func (b *BotEvent) SenderName() string {
+	return b.senderName
+}
