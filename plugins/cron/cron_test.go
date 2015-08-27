@@ -8,7 +8,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins/cron"
 )
 
-var testEvents = []*plugins.BotEvent{
+var testEvents = []plugins.BotEvent{
 	plugins.NewTestEvent("cron add */1 * * * * * hogehoge"),
 	plugins.NewTestEvent("cron list"),
 	plugins.NewTestEvent("cron help"),
@@ -18,7 +18,7 @@ var testEvents = []*plugins.BotEvent{
 func TestCheckMessage(t *testing.T) {
 	p := cron.Plugin{}
 	for _, testEvent := range testEvents {
-		ok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())
+		ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 		if !ok {
 			t.Errorf("ERROR check = NG")
 		}
@@ -32,7 +32,7 @@ func TestDoAction(t *testing.T) {
 	}
 
 	for _, testEvent := range testEvents {
-		next := p.DoAction(*testEvent, testEvent.BaseText())
+		next := p.DoAction(testEvent, testEvent.BaseText())
 		if next != false {
 			t.Errorf("ERROR next != false")
 		}

@@ -32,10 +32,10 @@ _, _ = fmt.Fprint(w, "\"\n)\n\nvar testEvent = plugins.NewTestEvent(\"test\")\n\
 //line command/templates/plugin_test_template.go.ego:13
 _, _ = fmt.Fprint(w, html.EscapeString(fmt.Sprintf("%v",  pkgName )))
 //line command/templates/plugin_test_template.go.ego:13
-_, _ = fmt.Fprint(w, ".Plugin{}\n\tok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())\n\tif !ok {\n\t\tt.Errorf(\"ERROR check = NG\")\n\t}\n}\n\nfunc TestDoAction(t *testing.T) {\n\tp := ")
+_, _ = fmt.Fprint(w, ".Plugin{}\n\tok, _ := p.CheckMessage(testEvent, testEvent.BaseText())\n\tif !ok {\n\t\tt.Errorf(\"ERROR check = NG\")\n\t}\n}\n\nfunc TestDoAction(t *testing.T) {\n\tp := ")
 //line command/templates/plugin_test_template.go.ego:21
 _, _ = fmt.Fprint(w, html.EscapeString(fmt.Sprintf("%v",  pkgName )))
 //line command/templates/plugin_test_template.go.ego:21
-_, _ = fmt.Fprint(w, ".Plugin{}\n\n\tnext := p.DoAction(*testEvent, testEvent.BaseText())\n\n\tif next != true {\n\t\tt.Errorf(\"ERROR next != true\")\n\t}\n}\n")
+_, _ = fmt.Fprint(w, ".Plugin{}\n\n\tnext := p.DoAction(testEvent, testEvent.BaseText())\n\n\tif next != true {\n\t\tt.Errorf(\"ERROR next != true\")\n\t}\n}\n")
 return nil
 }

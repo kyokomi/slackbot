@@ -11,7 +11,7 @@ var testEvent = plugins.NewTestEvent("てすと")
 
 func TestCheckMessage(t *testing.T) {
 	p := echo.Plugin{}
-	ok, _ := p.CheckMessage(*testEvent, testEvent.BaseText())
+	ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 	if !ok {
 		t.Errorf("ERROR check = NG")
 	}
@@ -20,7 +20,7 @@ func TestCheckMessage(t *testing.T) {
 func TestDoAction(t *testing.T) {
 	p := echo.Plugin{}
 
-	next := p.DoAction(*testEvent, testEvent.BaseText())
+	next := p.DoAction(testEvent, testEvent.BaseText())
 
 	if next != true {
 		t.Errorf("ERROR next != true")
