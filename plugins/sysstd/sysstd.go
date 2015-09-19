@@ -53,14 +53,8 @@ func (r Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, stri
 		log.Printf("botID     [%s]\n", event.BotID())
 	}
 
-	var cmdArgs []string
-	if strings.HasPrefix(message, event.BotLinkID()) {
-		cmdArgs = strings.Fields(message[len(event.BotLinkID()):])
-	} else if strings.HasPrefix(message, event.BotName()) {
-		cmdArgs = strings.Fields(message[len(event.BotName()):])
-	} else if strings.HasPrefix(message, event.BotID()) {
-		cmdArgs = strings.Fields(message[len(event.BotID()):])
-	} else {
+	cmdArgs, ok := event.BotCmdArgs(message)
+	if !ok {
 		return false, message
 	}
 
