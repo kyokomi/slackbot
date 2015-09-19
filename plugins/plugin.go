@@ -178,3 +178,7 @@ func (b *BotEvent) BotCmdArgs(message string) ([]string, bool) {
 		return []string{}, false
 	}
 }
+
+func (b *BotEvent) GetMessageSender() MessageSender {
+	return b.messageSender
+}
