@@ -1,6 +1,9 @@
 package plugins
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type PluginManager interface {
 	AddPlugin(key interface{}, val BotMessagePlugin)
@@ -161,4 +164,17 @@ func (b *BotEvent) SenderID() string {
 
 func (b *BotEvent) SenderName() string {
 	return b.senderName
+}
+
+func (b *BotEvent) BotCmdArgs(message string) ([]string, bool) {
+	switch {
+	case strings.HasPrefix(message, b.BotLinkID()):
+		return strings.Fields(message[len(b.BotLinkID()):]), true
+	case strings.HasPrefix(message, b.BotName()):
+		return strings.Fields(message[len(b.BotName()):]), true
+	case strings.HasPrefix(message, b.BotID()):
+		return strings.Fields(message[len(b.BotID()):]), true
+	default:
+		return []string{}, false
+	}
 }
