@@ -2,6 +2,7 @@ package lgtm
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kyokomi/slackbot/plugins"
@@ -10,14 +11,19 @@ import (
 type Plugin struct {
 }
 
-const lgtmURL = "http://www.lgtm.in/g"
+const lgtmURL = "http://lgtm.in/g"
 
 func (m Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
 	return plugins.CheckMessageKeyword(message, "lgtm")
 }
 
 func (m Plugin) DoAction(event plugins.BotEvent, message string) bool {
-	sendMessage, isNext := GetLGTMImageURL(lgtmURL)
+	randomURL := lgtmURL
+	args := strings.Fields(message)
+	if len(args) == 2 {
+		randomURL += "/" + args[1]
+	}
+	sendMessage, isNext := GetLGTMImageURL(randomURL)
 
 	event.Reply(sendMessage)
 

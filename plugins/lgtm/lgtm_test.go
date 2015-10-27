@@ -42,3 +42,14 @@ func TestGetLGTMImageURL(t *testing.T) {
 		fmt.Println(message)
 	}
 }
+
+func TestDoActionArgsUser(t *testing.T) {
+	p := lgtm.Plugin{}
+
+	testEvent := plugins.NewTestEvent("LGTM kyokomi")
+	next := p.DoAction(testEvent, testEvent.BaseText())
+
+	if next != false {
+		t.Errorf("ERROR next != false")
+	}
+}
