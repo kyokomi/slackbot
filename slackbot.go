@@ -26,7 +26,7 @@ func NewBotContext(token string) (*BotContext, error) {
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginManager(ctx)
-	ctx.AddPlugin("sysstd", sysstd.plugin{})
+	ctx.AddPlugin("sysstd", sysstd.NewPlugin())
 
 	return ctx, nil
 }
