@@ -16,7 +16,8 @@ var testEvents = []plugins.BotEvent{
 }
 
 func TestCheckMessage(t *testing.T) {
-	p := cron.Plugin{}
+	repository := cron.NewOnMemoryCronRepository()
+	p := cron.NewPlugin(cron.NewCronContext(repository))
 	for _, testEvent := range testEvents {
 		ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 		if !ok {
@@ -27,9 +28,7 @@ func TestCheckMessage(t *testing.T) {
 
 func TestDoAction(t *testing.T) {
 	repository := cron.NewOnMemoryCronRepository()
-	p := cron.Plugin{
-		CronContext: cron.NewCronContext(repository),
-	}
+	p := cron.NewPlugin(cron.NewCronContext(repository))
 
 	for _, testEvent := range testEvents {
 		next := p.DoAction(testEvent, testEvent.BaseText())

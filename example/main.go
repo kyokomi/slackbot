@@ -18,7 +18,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	bot.AddPlugin("echo", echo.Plugin{})
+	bot.AddPlugin("echo", echo.NewPlugin())
 
 	bot.WebSocketRTM()
 

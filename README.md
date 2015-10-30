@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	bot.AddPlugin("echo", echo.EchoMessage{})
+	bot.AddPlugin("echo", echo.NewPlugin())
 
 	bot.WebSocketRTM()
 
@@ -55,19 +55,23 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type EchoMessage struct {
+type plugin struct {
 }
 
-func (r EchoMessage) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func NewPlugin() plugins.BotMessagePlugin {
+	return &plugin{}
+}
+
+func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return true, message
 }
 
-func (r EchoMessage) DoAction(event plugins.BotEvent, message string) bool {
+func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	event.Reply(message)
 	return true // next ok
 }
 
-var _ plugins.BotMessagePlugin = (*EchoMessage)(nil)
+var _ plugins.BotMessagePlugin = (*plugin)(nil)
 ``` 
 
 ## License

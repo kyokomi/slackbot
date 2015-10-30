@@ -10,7 +10,7 @@ import (
 var testEvent = plugins.NewTestEvent("それは、なるほど")
 
 func TestCheckMessage(t *testing.T) {
-	p := naruhodo.Plugin{}
+	p := naruhodo.NewPlugin()
 	ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 	if !ok {
 		t.Errorf("ERROR check = NG")
@@ -18,7 +18,7 @@ func TestCheckMessage(t *testing.T) {
 }
 
 func TestDoAction(t *testing.T) {
-	p := naruhodo.Plugin{}
+	p := naruhodo.NewPlugin()
 
 	next := p.DoAction(testEvent, testEvent.BaseText())
 
