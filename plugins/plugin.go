@@ -101,7 +101,7 @@ func (b BotID) Equal(bot string) bool {
 }
 
 func (b BotID) LinkID() string {
-	return fmt.Sprintf("<@%s>:", b)
+	return fmt.Sprintf("<@%s>", b)
 }
 
 type BotEvent struct {
