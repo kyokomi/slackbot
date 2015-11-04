@@ -32,8 +32,7 @@ func NewPlugin(cx string, apiKey string) plugins.BotMessagePlugin {
 }
 
 func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
-	plugins.CheckMessageKeyword(message, "image me")
-	return true, message
+	return plugins.CheckMessageKeyword(message, "image me")
 }
 
 func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
