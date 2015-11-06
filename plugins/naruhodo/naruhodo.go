@@ -42,4 +42,10 @@ func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	return false // next ng
 }
 
+func (p *plugin) Help() string {
+	return `naruhodo: なるほど
+	文中に[なるほど]が含まれている、ランダムなるほどメッセージを返します。
+`
+}
+
 var _ plugins.BotMessagePlugin = (*plugin)(nil)

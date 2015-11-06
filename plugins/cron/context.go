@@ -11,6 +11,28 @@ import (
 	"github.com/robfig/cron"
 )
 
+const helpText = `
+register:
+	cron add */1 * * * * * hogehoge
+response:
+	<cron_id>
+
+delete:
+	cron del <cron_id>
+response:
+	delete message.
+
+list:
+	cron list
+response:
+	show added cron list.
+
+help:
+	cron help
+response:
+	show this help.
+`
+
 var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 type CronContext interface {
@@ -150,27 +172,7 @@ func (ctx *cronContext) ListCronCommand(channel string, _ CronCommand) string {
 }
 
 func (ctx *cronContext) HelpCronCommand(channel string, _ CronCommand) string {
-	return fmt.Sprintf("```\n%s\n```", `
-register:
-	cron add */1 * * * * * hogehoge
-response:
-	<cron_id>
-
-delete:
-	cron del <cron_id>
-response:
-	delete message.
-
-list:
-	cron list
-response:
-	show added cron list.
-
-help:
-	cron help
-response:
-	show this help.
-`)
+	return fmt.Sprintf("```\n%s\n```", helpText)
 }
 
 type CronRepository interface {

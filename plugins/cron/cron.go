@@ -54,4 +54,8 @@ func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	return false
 }
 
+func (p *plugin) Help() string {
+	return helpText
+}
+
 var _ plugins.BotMessagePlugin = (*plugin)(nil)

@@ -38,6 +38,15 @@ func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	return isNext // next stop
 }
 
+func (p *plugin) Help() string {
+	return `lgtm: LGTM
+	文中に[LGTM]が含まれていると、LGTM画像をランダムで表示します。
+
+	LGTM <user_name>:
+		指定ユーザーのLGTMリストからランダムに表示します。
+`
+}
+
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
 
 func GetLGTMImageURL(lgtmURL string) (string, bool) {
