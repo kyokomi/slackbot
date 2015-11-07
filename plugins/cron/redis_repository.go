@@ -6,35 +6,36 @@ import (
 	"log"
 	"strings"
 
-	"golang.org/x/net/context"
-	"gopkg.in/redis.v2"
+	"gopkg.in/redis.v3"
 	"gopkg.in/vmihailenco/msgpack.v1"
-
-	"github.com/kyokomi/goroku"
 )
 
 const (
 	redisCronTaskKey = "heroku:cron:task:%s"
 )
 
-type HerokuRedisRepository struct {
+type RedisRepository struct {
 	redisDB *redis.Client
 }
 
-func (s HerokuRedisRepository) Close() error {
+func (s RedisRepository) Close() error {
 	if s.redisDB != nil {
 		return s.redisDB.Close()
 	}
 	return nil
 }
 
-func NewHerokuRedisRepository() CronRepository {
-	s := &HerokuRedisRepository{}
-	s.redisDB = goroku.MustRedis(goroku.OpenRedis(context.Background()))
+func NewRedisRepository(addr, password string, db int64) CronRepository {
+	s := &RedisRepository{}
+	s.redisDB = redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: password,
+		DB:       db,
+	})
 	return s
 }
 
-func (s HerokuRedisRepository) Load() (map[string]CronTaskMap, error) {
+func (s RedisRepository) Load() (map[string]CronTaskMap, error) {
 	keys, err := s.redisDB.Keys(fmt.Sprintf(redisCronTaskKey, "*")).Result()
 	if err != nil {
 		return nil, err
@@ -71,7 +72,7 @@ func (s HerokuRedisRepository) Load() (map[string]CronTaskMap, error) {
 	return result, err
 }
 
-func (s HerokuRedisRepository) Save(taskMap map[string]CronTaskMap) error {
+func (s RedisRepository) Save(taskMap map[string]CronTaskMap) error {
 	var err error
 	for channelID, data := range taskMap {
 		for key, val := range data {
@@ -97,4 +98,4 @@ func (s HerokuRedisRepository) Save(taskMap map[string]CronTaskMap) error {
 	return err
 }
 
-var _ CronRepository = (*HerokuRedisRepository)(nil)
+var _ CronRepository = (*RedisRepository)(nil)

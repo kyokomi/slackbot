@@ -18,6 +18,16 @@ type BotContext struct {
 }
 
 func NewBotContext(token string) (*BotContext, error) {
+	ctx, err := NewBotContextNotSysstd(token)
+	if err != nil {
+		return nil, err
+	}
+	ctx.AddPlugin("sysstd", sysstd.NewPlugin(ctx.Plugins))
+
+	return ctx, nil
+}
+
+func NewBotContextNotSysstd(token string) (*BotContext, error) {
 	if token == "" {
 		return nil, errors.New("ERROR: slack token not found")
 	}
@@ -26,7 +36,6 @@ func NewBotContext(token string) (*BotContext, error) {
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginManager(ctx)
-	ctx.AddPlugin("sysstd", sysstd.Plugin{})
 
 	return ctx, nil
 }

@@ -10,7 +10,7 @@ import (
 var testEvent = plugins.NewTestEvent("突然の死だああああああああああ！")
 
 func TestCheckMessage(t *testing.T) {
-	p := suddendeath.Plugin{}
+	p := suddendeath.NewPlugin()
 	ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 	if !ok {
 		t.Errorf("ERROR check = NG")
@@ -18,7 +18,7 @@ func TestCheckMessage(t *testing.T) {
 }
 
 func TestDoAction(t *testing.T) {
-	p := suddendeath.Plugin{}
+	p := suddendeath.NewPlugin()
 
 	next := p.DoAction(testEvent, testEvent.BaseText())
 

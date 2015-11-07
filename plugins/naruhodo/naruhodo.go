@@ -8,29 +8,44 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-var naruhodoMap = []string{
-	"なるほどなるほどですぞ!",
-	"なるほど!",
-	"なるほど?",
-	"なーるほど！",
-	"それはなるほどですね",
-	"なるほど!!",
-	"なるほど!!!",
+type plugin struct {
+	rd          *rand.Rand
+	naruhodoMap []string
 }
 
-var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
-
-type Plugin struct {
+func NewPlugin() plugins.BotMessagePlugin {
+	return &plugin{
+		rd: rand.New(rand.NewSource(time.Now().UnixNano())),
+		naruhodoMap: []string{
+			"なるほどなるほどですぞ!",
+			"なるほど!",
+			"なるほど?",
+			"なーるほど！",
+			"それはなるほどですね",
+			"なるほど!!",
+			"なるほど!!!",
+		},
+	}
 }
 
-func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func (p *plugin) getRandomNaruhodo() string {
+	idx := int(p.rd.Int() % len(p.naruhodoMap))
+	return p.naruhodoMap[idx]
+}
+
+func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return strings.Index(message, "なるほど") != -1, message
 }
 
-func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
-	idx := int(rd.Int() % len(naruhodoMap))
-	event.Reply(naruhodoMap[idx])
+func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
+	event.Reply(p.getRandomNaruhodo())
 	return false // next ng
 }
 
-var _ plugins.BotMessagePlugin = (*Plugin)(nil)
+func (p *plugin) Help() string {
+	return `naruhodo: なるほど
+	文中に[なるほど]が含まれている、ランダムなるほどメッセージを返します。
+`
+}
+
+var _ plugins.BotMessagePlugin = (*plugin)(nil)

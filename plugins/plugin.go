@@ -11,7 +11,7 @@ type PluginManager interface {
 	StopReply()
 	StartReply()
 	IsReply() bool
-	GetPlugins() []Plugin
+	GetPlugins() []Plugin // deepCopy
 }
 
 type plugins struct {
@@ -69,12 +69,15 @@ func (ps *plugins) SendMessage(message string, channel string) {
 }
 
 func (ps *plugins) GetPlugins() []Plugin {
-	return ps.plugins
+	deepCopy := make([]Plugin, len(ps.plugins))
+	copy(deepCopy, ps.plugins)
+	return deepCopy
 }
 
 type BotMessagePlugin interface {
 	CheckMessage(event BotEvent, message string) (bool, string)
 	DoAction(event BotEvent, message string) bool
+	Help() string
 }
 
 type Plugin struct {

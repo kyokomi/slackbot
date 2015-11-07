@@ -4,18 +4,22 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type Plugin struct {
+type plugin struct {
 }
 
-func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func NewPlugin() plugins.BotMessagePlugin {
+	return &plugin{}
+}
+
+func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	// TODO: execute message check
 	return true, message
 }
 
-func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
+func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	// TODO: reply message action
 	event.Reply(message)
 	return true // next ok
 }
 
-var _ plugins.BotMessagePlugin = (*Plugin)(nil)
+var _ plugins.BotMessagePlugin = (*plugin)(nil)

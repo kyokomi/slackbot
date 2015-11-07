@@ -4,21 +4,27 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type Plugin struct {
+type plugin struct {
 	kohaAPI KohaAPI
 }
 
 func NewPlugin(kohaAPI KohaAPI) plugins.BotMessagePlugin {
-	return &Plugin{kohaAPI: kohaAPI}
+	return &plugin{kohaAPI: kohaAPI}
 }
 
-func (r Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func (r plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	return plugins.CheckMessageKeyword(message, "koha")
 }
 
-func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
+func (r plugin) DoAction(event plugins.BotEvent, message string) bool {
 	event.Reply(r.kohaAPI.GetImageURL())
 	return false // next ng
 }
 
-var _ plugins.BotMessagePlugin = (*Plugin)(nil)
+func (p *plugin) Help() string {
+	return `kohaimage: コハエース画像
+	文中にkohaが含まれていると、経験値先生力作のLINEスタンプ申請落ちした画像をランダムで表示します。
+`
+}
+
+var _ plugins.BotMessagePlugin = (*plugin)(nil)

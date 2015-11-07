@@ -7,11 +7,17 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-type Plugin struct {
-	*CronContext
+type plugin struct {
+	cron CronContext
 }
 
-func (p Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
+func NewPlugin(cron CronContext) plugins.BotMessagePlugin {
+	return &plugin{
+		cron: cron,
+	}
+}
+
+func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
 	// cron [action] [cron] [message]
 	if strings.HasPrefix(message, "cron") {
 		return true, message
@@ -19,7 +25,7 @@ func (p Plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) 
 	return false, message
 }
 
-func (p Plugin) DoAction(event plugins.BotEvent, message string) bool {
+func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	c := CronCommand{}
 	if err := c.Scan(message); err != nil {
 		log.Printf("error %s", err)
@@ -28,24 +34,28 @@ func (p Plugin) DoAction(event plugins.BotEvent, message string) bool {
 
 	switch c.Action {
 	case AddAction, RandomAddAction:
-		message := p.addCronCommand(event.Channel(), c)
-		p.refreshCron(&event, event.Channel())
+		message := p.cron.AddCronCommand(event.Channel(), c)
+		p.cron.RefreshCron(&event, event.Channel())
 		event.Reply(message)
 	case DelAction, DeleteAction, StopAction:
-		message := p.delCronCommand(event.Channel(), c)
-		p.refreshCron(&event, event.Channel())
+		message := p.cron.DelCronCommand(event.Channel(), c)
+		p.cron.RefreshCron(&event, event.Channel())
 		event.Reply(message)
 	case ListAction:
-		message := p.listCronCommand(event.Channel(), c)
+		message := p.cron.ListCronCommand(event.Channel(), c)
 		event.Reply(message)
 	case RefreshAction:
-		p.refreshCron(&event, event.Channel())
+		p.cron.RefreshCron(&event, event.Channel())
 		event.Reply("```\nrefresh ok\n```")
 	case HelpAction:
-		message := p.helpCronCommand(event.Channel(), c)
+		message := p.cron.HelpCronCommand(event.Channel(), c)
 		event.Reply(message)
 	}
 	return false
 }
 
-var _ plugins.BotMessagePlugin = (*Plugin)(nil)
+func (p *plugin) Help() string {
+	return "cron: cron制御できます\n" + helpText
+}
+
+var _ plugins.BotMessagePlugin = (*plugin)(nil)

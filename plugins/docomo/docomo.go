@@ -12,19 +12,19 @@ import (
 
 const repositoryDocomoContextKey = "docomo.context"
 
-type Plugin struct {
+type plugin struct {
 	client     *docomo.Client
 	repository slackbot.Repository
 }
 
 func NewPlugin(docomoClient *docomo.Client, repository slackbot.Repository) plugins.BotMessagePlugin {
-	return &Plugin{
+	return &plugin{
 		client:     docomoClient,
 		repository: repository,
 	}
 }
 
-func (r Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
+func (r plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
 	cmdArgs, ok := event.BotCmdArgs(message)
 	if !ok {
 		return false, message
@@ -32,7 +32,15 @@ func (r Plugin) CheckMessage(event plugins.BotEvent, message string) (bool, stri
 	return true, strings.Join(cmdArgs, " ")
 }
 
-func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
+func (p *plugin) Help() string {
+	return `docomo: ドコモ雑談
+	ドコモ雑談APIで会話します。部屋ごとにcontextを保持しています。
+`
+}
+
+var _ plugins.BotMessagePlugin = (*plugin)(nil)
+
+func (r plugin) DoAction(event plugins.BotEvent, message string) bool {
 	// Contextを取得
 	redisKey := buildRoomContextKey(event.Channel())
 	dialogueCtx, _ := r.repository.Load(redisKey)
@@ -70,5 +78,3 @@ func (r Plugin) DoAction(event plugins.BotEvent, message string) bool {
 func buildRoomContextKey(room string) string {
 	return fmt.Sprintf("%s.%s", repositoryDocomoContextKey, room)
 }
-
-var _ plugins.BotMessagePlugin = (*Plugin)(nil)

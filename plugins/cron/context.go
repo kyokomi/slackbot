@@ -11,16 +11,48 @@ import (
 	"github.com/robfig/cron"
 )
 
+const helpText = `
+	register:
+		cron add */1 * * * * * hogehoge
+	response:
+		<cron_id>
+
+	delete:
+		cron del <cron_id>
+	response:
+		delete message.
+
+	list:
+		cron list
+	response:
+		show added cron list.
+
+	help:
+		cron help
+	response:
+		show this help.
+`
+
 var rd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-type CronContext struct {
+type CronContext interface {
+	AddCronCommand(channel string, c CronCommand) string
+	DelCronCommand(channel string, c CronCommand) string
+	ListCronCommand(channel string, c CronCommand) string
+	HelpCronCommand(channel string, c CronCommand) string
+	RefreshCron(messageSender plugins.MessageSender, channel string)
+	AllRefreshCron(messageSender plugins.MessageSender)
+	Close()
+}
+
+type cronContext struct {
 	repository  CronRepository
 	cronClient  map[string]*cron.Cron
 	cronTaskMap map[string]CronTaskMap
 }
 
-func NewCronContext(repository CronRepository) *CronContext {
-	ctx := &CronContext{
+func NewCronContext(repository CronRepository) CronContext {
+	ctx := &cronContext{
 		cronClient: map[string]*cron.Cron{},
 		repository: repository,
 	}
@@ -33,14 +65,14 @@ func NewCronContext(repository CronRepository) *CronContext {
 	return ctx
 }
 
-func (ctx *CronContext) AllRefreshCron(messageSender plugins.MessageSender) {
+func (ctx *cronContext) AllRefreshCron(messageSender plugins.MessageSender) {
 	for channelID, _ := range ctx.cronTaskMap {
 		log.Println("RefreshCron channelID", channelID)
-		ctx.refreshCron(messageSender, channelID)
+		ctx.RefreshCron(messageSender, channelID)
 	}
 }
 
-func (ctx *CronContext) Close() {
+func (ctx *cronContext) Close() {
 	if ctx.cronClient != nil {
 		for _, c := range ctx.cronClient {
 			if c == nil {
@@ -55,7 +87,7 @@ func (ctx *CronContext) Close() {
 	}
 }
 
-func (ctx *CronContext) refreshCron(messageSender plugins.MessageSender, channel string) {
+func (ctx *cronContext) RefreshCron(messageSender plugins.MessageSender, channel string) {
 	if ctx.cronClient[channel] != nil {
 		ctx.cronClient[channel].Stop()
 		ctx.cronClient[channel] = nil
@@ -88,38 +120,38 @@ func (ctx *CronContext) refreshCron(messageSender plugins.MessageSender, channel
 	}
 }
 
-func (ctx *CronContext) startTask(channelID string, c CronCommand) {
+func (ctx *cronContext) startTask(channelID string, c CronCommand) {
 	if ctx.cronTaskMap[channelID] == nil {
 		ctx.cronTaskMap[channelID] = CronTaskMap{}
 	}
 	ctx.cronTaskMap[channelID].AddTask(c.CronKey(), CronTask{true, c})
 }
 
-func (ctx *CronContext) stopTask(channelID string, c CronCommand) {
+func (ctx *cronContext) stopTask(channelID string, c CronCommand) {
 	if ctx.cronTaskMap[channelID] == nil {
 		ctx.cronTaskMap[channelID] = CronTaskMap{}
 	}
 	ctx.cronTaskMap[channelID].AddTask(c.CronKey(), CronTask{false, c})
 }
 
-func (ctx *CronContext) getTaskMap(channelID string) map[string]CronTask {
+func (ctx *cronContext) getTaskMap(channelID string) map[string]CronTask {
 	if ctx.cronTaskMap[channelID] == nil {
 		ctx.cronTaskMap[channelID] = CronTaskMap{}
 	}
 	return ctx.cronTaskMap[channelID]
 }
 
-func (ctx *CronContext) addCronCommand(channel string, c CronCommand) string {
+func (ctx *cronContext) AddCronCommand(channel string, c CronCommand) string {
 	ctx.startTask(channel, c)
 	return fmt.Sprintf("`%s setup done`", c.CronID)
 }
 
-func (ctx *CronContext) delCronCommand(channel string, c CronCommand) string {
+func (ctx *cronContext) DelCronCommand(channel string, c CronCommand) string {
 	ctx.stopTask(channel, c)
 	return fmt.Sprintf("`%s deleted done`", c.CronID)
 }
 
-func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
+func (ctx *cronContext) ListCronCommand(channel string, _ CronCommand) string {
 	cronSpecMessage := []string{}
 	for _, ccd := range ctx.getTaskMap(channel) {
 		if !ccd.Active {
@@ -139,28 +171,8 @@ func (ctx *CronContext) listCronCommand(channel string, _ CronCommand) string {
 	return fmt.Sprintf("```\n%s\n```", message)
 }
 
-func (ctx *CronContext) helpCronCommand(channel string, _ CronCommand) string {
-	return fmt.Sprintf("```\n%s\n```", `
-register:
-	cron add */1 * * * * * hogehoge
-response:
-	<cron_id>
-
-delete:
-	cron del <cron_id>
-response:
-	delete message.
-
-list:
-	cron list
-response:
-	show added cron list.
-
-help:
-	cron help
-response:
-	show this help.
-`)
+func (ctx *cronContext) HelpCronCommand(channel string, _ CronCommand) string {
+	return fmt.Sprintf("```\n%s\n```", helpText)
 }
 
 type CronRepository interface {
