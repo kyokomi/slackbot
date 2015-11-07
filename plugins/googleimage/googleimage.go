@@ -77,7 +77,8 @@ func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 
 func (p *plugin) Help() string {
 	return `googleimage: グーグル画像検索
-	image me [検索キーワード]`
+	image me [検索キーワード]
+	`
 }
 
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
