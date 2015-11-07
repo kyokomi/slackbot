@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"bytes"
+
 	"github.com/kyokomi/slackbot/plugins"
 )
 
@@ -17,9 +19,12 @@ type Plugin interface {
 	// plugins.BotMessagePlugin
 	CheckMessage(event plugins.BotEvent, message string) (bool, string)
 	DoAction(event plugins.BotEvent, message string) bool
+	Help() string
 }
 
 type plugin struct {
+	pm plugins.PluginManager
+
 	debug       bool
 	timeZone    string
 	timeZoneMap map[string]time.Location
@@ -30,8 +35,9 @@ type plugin struct {
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
 var _ Plugin = (*plugin)(nil)
 
-func NewPlugin() Plugin {
+func NewPlugin(pm plugins.PluginManager) Plugin {
 	p := &plugin{
+		pm:       pm,
 		debug:    false,
 		timeZone: "Local",
 		timeZoneMap: map[string]time.Location{
@@ -59,8 +65,7 @@ func NewPlugin() Plugin {
 		"help": commands{
 			commandList: []string{"help", "-h", "--help"},
 			commandFunc: func(args ...string) string {
-				// TODO: 未実装ちょいまち
-				return "TODO: 未実装"
+				return p.buildPluginsHelp()
 			},
 		},
 		"timezone": commands{
@@ -82,6 +87,17 @@ func NewPlugin() Plugin {
 	}
 
 	return p
+}
+
+func (p *plugin) buildPluginsHelp() string {
+	resMessage := bytes.Buffer{}
+	for idx, p := range p.pm.GetPlugins() {
+		if idx != 0 {
+			resMessage.WriteString("\n")
+		}
+		resMessage.WriteString(p.Help())
+	}
+	return resMessage.String()
 }
 
 func (p *plugin) SetDebug(debug bool) {
@@ -147,4 +163,32 @@ func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
 	}
 	event.Reply(p.executeCommand(cmdArgs...))
 	return false // next ok
+}
+func (p *plugin) Help() string {
+	return `sysstd: botシステム系のコマンド
+
+	<botName/botID> date :
+
+		現在時間を表示
+
+	<botName/botID> help :
+
+		すべてのプラグインのHelpを表示
+
+	<botName/botID> timezone :
+
+		現在設定されているタイムゾーンを表示
+
+	<botName/botID> timezone <JST/UTC/Local>:
+
+		指定したタイムゾーンに変更
+
+	<botName/botID> command <linux command>:
+
+		bot環境によって動かないコマンドもあります。
+
+		Example:
+
+			botName command ls -al
+	`
 }

@@ -21,4 +21,10 @@ func (r plugin) DoAction(event plugins.BotEvent, message string) bool {
 	return false // next ng
 }
 
+func (p *plugin) Help() string {
+	return `kohaimage: コハエース画像
+	文中にkohaが含まれていると、経験値先生力作のLINEスタンプ申請落ちした画像をランダムで表示します。
+`
+}
+
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
