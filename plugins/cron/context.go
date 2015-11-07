@@ -12,25 +12,25 @@ import (
 )
 
 const helpText = `
-register:
-	cron add */1 * * * * * hogehoge
-response:
-	<cron_id>
+	register:
+		cron add */1 * * * * * hogehoge
+	response:
+		<cron_id>
 
-delete:
-	cron del <cron_id>
-response:
-	delete message.
+	delete:
+		cron del <cron_id>
+	response:
+		delete message.
 
-list:
-	cron list
-response:
-	show added cron list.
+	list:
+		cron list
+	response:
+		show added cron list.
 
-help:
-	cron help
-response:
-	show this help.
+	help:
+		cron help
+	response:
+		show this help.
 `
 
 var rd = rand.New(rand.NewSource(time.Now().UnixNano()))

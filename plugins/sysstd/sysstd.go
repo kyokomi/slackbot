@@ -91,12 +91,14 @@ func NewPlugin(pm plugins.PluginManager) Plugin {
 
 func (p *plugin) buildPluginsHelp() string {
 	resMessage := bytes.Buffer{}
+	resMessage.WriteString("```\n")
 	for idx, p := range p.pm.GetPlugins() {
 		if idx != 0 {
 			resMessage.WriteString("\n")
 		}
 		resMessage.WriteString(p.Help())
 	}
+	resMessage.WriteString("\n```")
 	return resMessage.String()
 }
 

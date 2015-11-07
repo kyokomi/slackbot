@@ -44,7 +44,12 @@ func (r *plugin) DoAction(event plugins.BotEvent, message string) bool {
 func (p *plugin) Help() string {
 	return `suddendeath: 突然の死
 
-	突然の<free message> :`
+	突然の<free message>:
+
+		＿人人人人人人人人人人人人＿
+		＞　突然のfree message　＜
+		￣Y^Y^Y^Y^Y^Y^Y^Y^Y^Y￣
+`
 }
 
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
