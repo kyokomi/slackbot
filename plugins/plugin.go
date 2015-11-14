@@ -160,6 +160,9 @@ func (b *BotEvent) BotName() string {
 func (b *BotEvent) BotLinkID() string {
 	return b.botID.LinkID()
 }
+func (b *BotEvent) BotLinkIDForClient() string {
+	return b.botID.LinkID() + ":"
+}
 
 func (b *BotEvent) SenderID() string {
 	return b.senderID
@@ -171,6 +174,8 @@ func (b *BotEvent) SenderName() string {
 
 func (b *BotEvent) BotCmdArgs(message string) ([]string, bool) {
 	switch {
+	case strings.HasPrefix(message, b.BotLinkIDForClient()):
+		return strings.Fields(message[len(b.BotLinkIDForClient()):]), true
 	case strings.HasPrefix(message, b.BotLinkID()):
 		return strings.Fields(message[len(b.BotLinkID()):]), true
 	case strings.HasPrefix(message, b.BotName()):
