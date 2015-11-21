@@ -17,7 +17,7 @@ func NewPlugin() plugins.BotMessagePlugin {
 }
 
 func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string) {
-	return plugins.CheckMessageKeyword(message, keyword)
+	return plugins.CheckMessageKeywords(message, keyword)
 }
 
 func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
