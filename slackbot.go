@@ -87,7 +87,8 @@ func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) 
 					for _, c := range ev.Info.Channels {
 						connectedFunc(plugins.NewBotEvent(ctx,
 							botUser.ID, botUser.Name,
-							ev.Info.User.ID, ev.Info.User.Name, "connected", c.ID,
+							ev.Info.User.ID, ev.Info.User.Name, "connected",
+							c.ID, c.Name,
 						))
 					}
 				case *slack.MessageEvent:
@@ -108,7 +109,17 @@ func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) 
 
 func (ctx *botContext) responseEvent(ev *slack.MessageEvent) plugins.BotEvent {
 	botUser := ctx.RTM.GetInfo().User
-	return plugins.NewBotEvent(ctx, botUser.ID, botUser.Name, ev.User, ev.Username, ev.Text, ev.Channel)
+
+	var chName string
+	cInfo, err := ctx.RTM.Client.GetChannelInfo(ev.Channel)
+	if err == nil {
+		chName = cInfo.Name
+	}
+
+	return plugins.NewBotEvent(ctx,
+		botUser.ID, botUser.Name,
+		ev.User, ev.Username, ev.Text, ev.Channel, chName,
+	)
 }
 
 func (ctx *botContext) SendMessage(message, channel string) {

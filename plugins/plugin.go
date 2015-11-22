@@ -113,15 +113,16 @@ type BotEvent struct {
 	botID   BotID
 	botName string
 
-	senderID   string
-	senderName string
-	text       string
-	channel    string
+	senderID    string
+	senderName  string
+	text        string
+	channelID   string
+	channelName string
 }
 
 var _ MessageSender = (*BotEvent)(nil)
 
-func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, text, channel string) BotEvent {
+func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, text, channelID, channelName string) BotEvent {
 	return BotEvent{
 		messageSender: sender,
 		botID:         BotID(botID),
@@ -129,7 +130,8 @@ func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, tex
 		senderID:      senderID,
 		senderName:    senderName,
 		text:          text,
-		channel:       channel,
+		channelID:     channelID,
+		channelName:   channelName,
 	}
 }
 
@@ -145,8 +147,17 @@ func (b *BotEvent) BaseText() string {
 	return b.text
 }
 
+// Channel is Deprecated
 func (b *BotEvent) Channel() string {
-	return b.channel
+	return b.ChannelID()
+}
+
+func (b *BotEvent) ChannelID() string {
+	return b.channelID
+}
+
+func (b *BotEvent) ChannelName() string {
+	return b.channelName
 }
 
 func (b *BotEvent) BotID() string {
@@ -173,17 +184,22 @@ func (b *BotEvent) SenderName() string {
 }
 
 func (b *BotEvent) BotCmdArgs(message string) ([]string, bool) {
+	trimMessage, ok := b.BotCmdMessage(message)
+	return strings.Fields(trimMessage), ok
+}
+
+func (b *BotEvent) BotCmdMessage(message string) (string, bool) {
 	switch {
 	case strings.HasPrefix(message, b.BotLinkIDForClient()):
-		return strings.Fields(message[len(b.BotLinkIDForClient()):]), true
+		return message[len(b.BotLinkIDForClient()):], true
 	case strings.HasPrefix(message, b.BotLinkID()):
-		return strings.Fields(message[len(b.BotLinkID()):]), true
+		return message[len(b.BotLinkID()):], true
 	case strings.HasPrefix(message, b.BotName()):
-		return strings.Fields(message[len(b.BotName()):]), true
+		return message[len(b.BotName()):], true
 	case strings.HasPrefix(message, b.BotID()):
-		return strings.Fields(message[len(b.BotID()):]), true
+		return message[len(b.BotID()):], true
 	default:
-		return []string{}, false
+		return "", false
 	}
 }
 
