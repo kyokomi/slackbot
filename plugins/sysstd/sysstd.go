@@ -129,10 +129,11 @@ func (p *plugin) executeCommand(args ...string) string {
 
 func (p *plugin) CheckMessage(event plugins.BotEvent, message string) (bool, string) {
 	if p.debug {
-		log.Printf("message   [%s]\n", message)
-		log.Printf("botLinkID [%s]\n", event.BotLinkID())
-		log.Printf("botName   [%s]\n", event.BotName())
-		log.Printf("botID     [%s]\n", event.BotID())
+		log.Printf("message            [%s]\n", message)
+		log.Printf("botLinkID          [%s]\n", event.BotLinkID())
+		log.Printf("botLinkIDForClient [%s]\n", event.BotLinkIDForClient())
+		log.Printf("botName            [%s]\n", event.BotName())
+		log.Printf("botID              [%s]\n", event.BotID())
 	}
 
 	cmdArgs, ok := event.BotCmdArgs(message)
