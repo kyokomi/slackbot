@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/kyokomi/slackbot"
+	"github.com/kyokomi/slackbot/plugins"
 	"github.com/kyokomi/slackbot/plugins/echo"
 )
 
@@ -18,9 +19,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	bot.AddPlugin("echo", echo.NewPlugin())
 
-	bot.WebSocketRTM()
+	bot.Run(func(event plugins.BotEvent) {
+		if event.ChannelName() == "#general" {
+			event.Reply("OK")
+		}
+	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
