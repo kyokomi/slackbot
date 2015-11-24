@@ -51,15 +51,8 @@ func NewPlugin(pm plugins.PluginManager) Plugin {
 		"date": commands{
 			commandList: []string{"date", "dateCommand"},
 			commandFunc: func(args ...string) string {
-				if len(args) < 3 {
-					return "command not found"
-				}
-				data, err := exec.Command(args[1], args[2:]...).CombinedOutput()
-				if err != nil {
-					return fmt.Sprintf("`%s`", err.Error())
-				} else {
-					return fmt.Sprintf("```\n%s```", string(data))
-				}
+				loc := p.getTimeZoneLocation()
+				return time.Now().In(&loc).Format(defaultTimeFormat)
 			},
 		},
 		"help": commands{
@@ -71,17 +64,24 @@ func NewPlugin(pm plugins.PluginManager) Plugin {
 		"timezone": commands{
 			commandList: []string{"timezone", "setTimezoneCommand"},
 			commandFunc: func(args ...string) string {
-				loc := p.getTimeZoneLocation()
-				return time.Now().In(&loc).Format(defaultTimeFormat)
+				if len(args) >= 2 {
+					p.SetTimezone(args[1])
+				}
+				return fmt.Sprintf("%#v", p.getTimeZoneLocation())
 			},
 		},
 		"command": commands{
 			commandList: []string{"command", "cmd", "exec"},
 			commandFunc: func(args ...string) string {
-				if len(args) >= 2 {
-					p.SetTimezone(args[1])
+				if len(args) < 3 {
+					return "command not found"
 				}
-				return fmt.Sprintf("%#v", p.getTimeZoneLocation())
+				data, err := exec.Command(args[1], args[2:]...).CombinedOutput()
+				if err != nil {
+					return fmt.Sprintf("`%s`", err.Error())
+				} else {
+					return fmt.Sprintf("```\n%s```", string(data))
+				}
 			},
 		},
 	}
