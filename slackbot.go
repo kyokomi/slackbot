@@ -11,28 +11,42 @@ import (
 	"github.com/kyokomi/slackbot/plugins/sysstd"
 )
 
-type BotContext struct {
+type BotContext interface {
+	PluginManager() plugins.PluginManager
+	AddPlugin(key interface{}, val plugins.BotMessagePlugin)
+	WebSocketRTM()
+	Run(connectedFunc func(event plugins.BotEvent))
+
+	// plugins.MessageSender
+	SendMessage(message, channel string)
+}
+
+type botContext struct {
 	Plugins plugins.PluginManager
 	Client  *slack.Client
 	RTM     *slack.RTM
 }
 
-func NewBotContext(token string) (*BotContext, error) {
+func (b *botContext) PluginManager() plugins.PluginManager {
+	return b.Plugins
+}
+
+func NewBotContext(token string) (BotContext, error) {
 	ctx, err := NewBotContextNotSysstd(token)
 	if err != nil {
 		return nil, err
 	}
-	ctx.AddPlugin("sysstd", sysstd.NewPlugin(ctx.Plugins))
+	ctx.AddPlugin("sysstd", sysstd.NewPlugin(ctx.PluginManager()))
 
 	return ctx, nil
 }
 
-func NewBotContextNotSysstd(token string) (*BotContext, error) {
+func NewBotContextNotSysstd(token string) (BotContext, error) {
 	if token == "" {
 		return nil, errors.New("ERROR: slack token not found")
 	}
 
-	ctx := &BotContext{}
+	ctx := &botContext{}
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginManager(ctx)
@@ -40,12 +54,21 @@ func NewBotContextNotSysstd(token string) (*BotContext, error) {
 	return ctx, nil
 }
 
-func (ctx *BotContext) AddPlugin(key interface{}, val plugins.BotMessagePlugin) {
+func (ctx *botContext) AddPlugin(key interface{}, val plugins.BotMessagePlugin) {
 	fmt.Println("insert plugin ", key)
 	ctx.Plugins.AddPlugin(key, val)
 }
 
-func (ctx *BotContext) WebSocketRTM() {
+func (ctx *botContext) Run(connectedFunc func(event plugins.BotEvent)) {
+	ctx.webSocketRTM(connectedFunc)
+}
+
+// WebSocketRTM is Deprecated
+func (ctx *botContext) WebSocketRTM() {
+	ctx.webSocketRTM(func(event plugins.BotEvent) { log.Println("connected ", event.Channel()) })
+}
+
+func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) {
 	if ctx.RTM != nil {
 		ctx.RTM.Disconnect()
 	}
@@ -60,12 +83,16 @@ func (ctx *BotContext) WebSocketRTM() {
 				fmt.Print("Event Received: ")
 				switch ev := msg.Data.(type) {
 				case *slack.ConnectedEvent:
-					fmt.Println("Infos:", ev.Info)
-					fmt.Println("Connection counter:", ev.ConnectionCount)
-					// Replace #general with your Channel ID
-					ctx.SendMessage("Hello world", "#general")
+					botUser := ctx.RTM.GetInfo().User
+					for _, c := range ev.Info.Channels {
+						connectedFunc(plugins.NewBotEvent(ctx,
+							botUser.ID, botUser.Name,
+							ev.Info.User.ID, ev.Info.User.Name, "connected",
+							c.ID, c.Name,
+						))
+					}
 				case *slack.MessageEvent:
-					ctx.responseEvent(ev)
+					ctx.Plugins.ExecPlugins(ctx.responseEvent(ev))
 				case *slack.PresenceChangeEvent:
 					fmt.Printf("Presence Change: %v\n", ev)
 				case slack.LatencyReport:
@@ -73,28 +100,36 @@ func (ctx *BotContext) WebSocketRTM() {
 				case *slack.RTMError:
 					fmt.Printf("Error: %d - %s\n", ev.Code, ev.Msg)
 				default:
-					fmt.Printf("Unexpected: %+v\n", msg.Data)
+					fmt.Printf("Unexpected: %+v\n", ev)
 				}
 			}
 		}
 	}()
 }
 
-func (ctx *BotContext) responseEvent(ev *slack.MessageEvent) {
+func (ctx *botContext) responseEvent(ev *slack.MessageEvent) plugins.BotEvent {
 	botUser := ctx.RTM.GetInfo().User
 
-	e := plugins.NewBotEvent(ctx, botUser.ID, botUser.Name, ev.User, ev.Username, ev.Text, ev.Channel)
-	ctx.Plugins.ExecPlugins(e)
+	var chName string
+	cInfo, err := ctx.RTM.Client.GetChannelInfo(ev.Channel)
+	if err == nil {
+		chName = cInfo.Name
+	}
+
+	return plugins.NewBotEvent(ctx,
+		botUser.ID, botUser.Name,
+		ev.User, ev.Username, ev.Text, ev.Channel, chName,
+	)
 }
 
-func (ctx *BotContext) SendMessage(message, channel string) {
+func (ctx *botContext) SendMessage(message, channel string) {
 	if !ctx.Plugins.IsReply() {
 		return
 	}
 	log.Println("WithSendChannelMessageFunc", channel, message)
-	if message != "" && channel != "" {
+	if message != "" {
 		ctx.RTM.SendMessage(ctx.RTM.NewOutgoingMessage(message, channel))
 	}
 }
 
-var _ plugins.MessageSender = (*BotContext)(nil)
+var _ plugins.MessageSender = (*botContext)(nil)

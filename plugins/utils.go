@@ -37,5 +37,10 @@ func (b DebugMessageSender) SendMessage(message string, channel string) {
 var _ MessageSender = (*DebugMessageSender)(nil)
 
 func NewTestEvent(message string) BotEvent {
-	return NewBotEvent(DebugMessageSender{}, "botID", "botName", "userID", "userName", message, "#general")
+	return NewBotEvent(DebugMessageSender{},
+		"botID", "botName",
+		"userID", "userName",
+		message,
+		"CH_AAAAAAA", "#general",
+	)
 }

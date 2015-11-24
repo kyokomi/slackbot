@@ -48,7 +48,7 @@ func TestSysstdBuildPluginsHelp(t *testing.T) {
 		t.Error(err)
 	}
 	botCtx.AddPlugin("echo", echo.NewPlugin())
-	p := sysstd.NewPlugin(botCtx.Plugins)
+	p := sysstd.NewPlugin(botCtx.PluginManager())
 
 	ev := plugins.NewTestEvent("botID help")
 	p.DoAction(ev, "help")
