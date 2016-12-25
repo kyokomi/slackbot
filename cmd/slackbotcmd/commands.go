@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/codegangsta/cli"
 	"github.com/kyokomi/slackbot/cmd/slackbotcmd/command"
+	"github.com/urfave/cli"
 )
 
 var GlobalFlags = []cli.Flag{}
