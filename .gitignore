@@ -76,3 +76,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+## vendoring
+vendor/
