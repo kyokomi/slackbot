@@ -19,7 +19,7 @@ prof=${1:-".profile.cov"}
 echo "mode: count" > $prof
 gopath1=$(echo $GOPATH | cut -d: -f1)
 echo "mode: count" > $prof
-for pkg in $(go list ./...); do
+for pkg in $(go list ./... | grep -v vendor); do
   tmpprof=$gopath1/src/$pkg/profile.tmp
   go test -covermode=count -coverprofile=$tmpprof $pkg
   if [ -f $tmpprof ]; then

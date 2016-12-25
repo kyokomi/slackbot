@@ -11,10 +11,10 @@ build:
         name: go vet
         code: |
           go vet $(go list ./... | grep -v /vendor/ )
-    - mitsuse/gover:
-        project: "github.com/kyokomi/slackbot"
-        report:  "coverage.txt"
     - script:
-        name: print coverage
+        name: coverage
         code: |
-          cat coverage.txt
+          go get golang.org/x/tools/cmd/cover
+          go get github.com/mattn/goveralls
+          sh ./_ci/test/post/gocoverage_all.sh
+          goveralls -coverprofile=.profile.cov -service=wercker.com -repotoken $COVERALLS_TOKEN
