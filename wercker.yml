@@ -1,5 +1,5 @@
+box: golang
 build:
-  box: golang
   steps:
     - glide-install
     - setup-go-workspace
@@ -11,6 +11,11 @@ build:
         name: go vet
         code: |
           go vet $(go list ./... | grep -v /vendor/ )
+
+goveralls:
+  steps:
+    - glide-install
+    - setup-go-workspace
     - script:
         name: coverage
         code: |
