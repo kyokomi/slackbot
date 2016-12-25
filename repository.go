@@ -1,6 +1,8 @@
 package slackbot
 
 import (
+	"time"
+
 	"gopkg.in/redis.v3"
 )
 
@@ -55,7 +57,7 @@ func (r *redisRepository) Load(key string) (string, error) {
 }
 
 func (r *redisRepository) Save(key string, value string) error {
-	return r.redisDB.Set(key, value).Err()
+	return r.redisDB.Set(key, value, time.Duration(0)).Err()
 }
 
 func (r *redisRepository) Close() error {

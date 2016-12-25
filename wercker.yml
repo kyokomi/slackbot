@@ -1,0 +1,20 @@
+build:
+  box: golang
+  steps:
+    - glide-install
+    - setup-go-workspace
+    - script:
+        name: go test
+        code: |
+          go test -v -cover $(go list ./... | grep -v /vendor/ )
+    - script:
+        name: go vet
+        code: |
+          go vet $(go list ./... | grep -v /vendor/ )
+    - mitsuse/gover:
+        project: "github.com/kyokomi/slackbot"
+        report:  "coverage.txt"
+    - script:
+        name: print coverage
+        code: |
+          cat coverage.txt
