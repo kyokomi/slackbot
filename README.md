@@ -1,8 +1,7 @@
-slackbot
+slackbot [![Coverage Status](https://coveralls.io/repos/kyokomi/slackbot/badge.svg?branch=master&service=github)](https://coveralls.io/github/kyokomi/slackbot?branch=master)
 ========================
 
-[![Circle CI](https://circleci.com/gh/kyokomi/slackbot.svg?style=svg)](https://circleci.com/gh/kyokomi/slackbot)
-[![Coverage Status](https://coveralls.io/repos/kyokomi/slackbot/badge.svg?branch=master&service=github)](https://coveralls.io/github/kyokomi/slackbot?branch=master)
+[![wercker status](https://app.wercker.com/status/f609e74d43a232c26e011144646c2cf4/m/master "wercker status")](https://app.wercker.com/project/byKey/f609e74d43a232c26e011144646c2cf4)
 
 Plugin extension a simple slack bot for golang.
 
