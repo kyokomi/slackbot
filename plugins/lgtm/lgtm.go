@@ -1,6 +1,7 @@
 package lgtm
 
 import (
+	"crypto/tls"
 	"net/http"
 	"strings"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/kyokomi/slackbot/plugins"
 )
 
-const lgtmURL = "http://lgtm.in/g"
+const lgtmURL = "https://lgtm.in/g"
 
 type plugin struct {
 }
@@ -50,7 +51,12 @@ func (p *plugin) Help() string {
 var _ plugins.BotMessagePlugin = (*plugin)(nil)
 
 func GetLGTMImageURL(lgtmURL string) (string, bool) {
-	res, err := http.Get(lgtmURL)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
+	client := http.Client{Transport: tr}
+	res, err := client.Get(lgtmURL)
 	if err != nil {
 		return err.Error(), true
 	}

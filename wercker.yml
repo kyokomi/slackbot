@@ -1,0 +1,20 @@
+build:
+  box: golang
+  steps:
+    - glide-install
+    - setup-go-workspace
+    - script:
+        name: go test
+        code: |
+          go test -v -cover $(go list ./... | grep -v /vendor/ )
+    - script:
+        name: go vet
+        code: |
+          go vet $(go list ./... | grep -v /vendor/ )
+    - script:
+        name: coverage
+        code: |
+          go get golang.org/x/tools/cmd/cover
+          go get github.com/mattn/goveralls
+          sh ./_ci/test/post/gocoverage_all.sh
+          goveralls -coverprofile=.profile.cov -service=wercker.com -repotoken $COVERALLS_TOKEN
