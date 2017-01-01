@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/kyokomi/slackbot/plugins"
-	"github.com/kyokomi/slackbot/plugins/cron"
+	"github.com/kyokomi/slackbot/plugins/cron/v2"
 )
 
 var testEvents = []plugins.BotEvent{
@@ -16,8 +16,12 @@ var testEvents = []plugins.BotEvent{
 }
 
 func TestCheckMessage(t *testing.T) {
-	repository := cron.NewOnMemoryRepository()
-	p := cron.NewPlugin(cron.NewContext(repository))
+	repository := cron.NewInMemoryRepository()
+	ctx, err := cron.NewContext(repository)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	p := cron.NewPlugin(ctx)
 	for _, testEvent := range testEvents {
 		ok, _ := p.CheckMessage(testEvent, testEvent.BaseText())
 		if !ok {
@@ -27,8 +31,12 @@ func TestCheckMessage(t *testing.T) {
 }
 
 func TestDoAction(t *testing.T) {
-	repository := cron.NewOnMemoryRepository()
-	p := cron.NewPlugin(cron.NewContext(repository))
+	repository := cron.NewInMemoryRepository()
+	ctx, err := cron.NewContext(repository)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	p := cron.NewPlugin(ctx)
 
 	for _, testEvent := range testEvents {
 		next := p.DoAction(testEvent, testEvent.BaseText())

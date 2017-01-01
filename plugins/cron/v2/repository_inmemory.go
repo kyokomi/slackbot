@@ -2,7 +2,7 @@ package cron
 
 // NewInMemoryRepository create in memory repository
 func NewInMemoryRepository() Repository {
-	return inMemoryRepository{
+	return &inMemoryRepository{
 		taskMap: map[string]TaskMap{},
 	}
 }
