@@ -1,5 +1,5 @@
 hash: 74f263176b108010487df2204dda5fa6f5932cae76c3915317450a657cc7bec0
-updated: 2016-12-25T17:17:38.522029531+09:00
+updated: 2017-01-01T23:47:33.256649415+09:00
 imports:
 - name: github.com/andybalholm/cascadia
   version: 349dd0209470eabd9514242c688c403c0926d266
@@ -8,7 +8,6 @@ imports:
 - name: github.com/garyburd/redigo
   version: 80f7de34463b0ed3d7c61303e5619efe1b227f92
   subpackages:
-  - internal
   - redis
 - name: github.com/golang/mock
   version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
