@@ -110,6 +110,8 @@ func (b BotID) LinkID() string {
 type BotEvent struct {
 	messageSender MessageSender
 
+	domain string
+
 	botID   BotID
 	botName string
 
@@ -118,13 +120,15 @@ type BotEvent struct {
 	text        string
 	channelID   string
 	channelName string
+	timestamp   string
 }
 
 var _ MessageSender = (*BotEvent)(nil)
 
-func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, text, channelID, channelName string) BotEvent {
+func NewBotEvent(sender MessageSender, domain, botID, botName, senderID, senderName, text, channelID, channelName, timestamp string) BotEvent {
 	return BotEvent{
 		messageSender: sender,
+		domain:        domain,
 		botID:         BotID(botID),
 		botName:       botName,
 		senderID:      senderID,
@@ -132,6 +136,7 @@ func NewBotEvent(sender MessageSender, botID, botName, senderID, senderName, tex
 		text:          text,
 		channelID:     channelID,
 		channelName:   channelName,
+		timestamp:     timestamp,
 	}
 }
 
@@ -181,6 +186,12 @@ func (b *BotEvent) SenderID() string {
 
 func (b *BotEvent) SenderName() string {
 	return b.senderName
+}
+
+// ArchivesURL return copy link archives url
+func (b *BotEvent) ArchivesURL() string {
+	// Slackの仕様が変わると使えなくなるのであまり推奨しない方法
+	return fmt.Sprintf("https://%s.slack.com/archives/%s/p%s", b.domain, b.channelName, strings.Replace(b.timestamp, ".", "", 1))
 }
 
 func (b *BotEvent) BotCmdArgs(message string) ([]string, bool) {
