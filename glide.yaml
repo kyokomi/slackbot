@@ -1,3 +1,4 @@
+
 package: github.com/kyokomi/slackbot
 import:
 - package: github.com/PuerkitoBio/goquery
