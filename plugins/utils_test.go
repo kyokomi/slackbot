@@ -1,12 +1,13 @@
-package router
+package plugins_test
 
 import (
 	"testing"
 
+	"github.com/kyokomi/slackbot/plugins"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_quotationOrSpaceFields(t *testing.T) {
+func TestUtils_quotationOrSpaceFields(t *testing.T) {
 	as := assert.New(t)
 	type testCase struct {
 		s    string
@@ -23,7 +24,8 @@ func Test_quotationOrSpaceFields(t *testing.T) {
 		},
 	}
 
+	ut := plugins.NewUtils(nil)
 	for i, ts := range testCases {
-		as.Equal(quotationOrSpaceFields(ts.s), ts.args, "testCase [%d]", i)
+		as.Equal(ut.QuotationOrSpaceFields(ts.s), ts.args, "testCase [%d]", i)
 	}
 }

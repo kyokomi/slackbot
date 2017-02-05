@@ -3,6 +3,8 @@ package router
 import (
 	"fmt"
 	"regexp"
+
+	"github.com/kyokomi/slackbot/plugins"
 )
 
 type filter struct {
@@ -25,7 +27,7 @@ func (f filter) String() string {
 }
 
 func (f *filter) parse(value string) {
-	args := quotationOrSpaceFields(value)
+	args := plugins.DefaultUtils.QuotationOrSpaceFields(value)
 
 	f.ChannelName = args[0]
 	if len(args) > 1 {

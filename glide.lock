@@ -1,5 +1,5 @@
 hash: 22cfb7d6fcb121af5ba4ddef893cbae46876fa990f54c15923c717ab29c3b7f4
-updated: 2017-02-05T10:51:25.141086989+09:00
+updated: 2017-02-05T17:44:11.420373776+09:00
 imports:
 - name: github.com/andybalholm/cascadia
   version: 349dd0209470eabd9514242c688c403c0926d266
@@ -28,6 +28,10 @@ imports:
   version: 152b1a2c8f5d0340f658bb656032a39b94e52958
 - name: github.com/robfig/cron
   version: 9585fd555638e77bba25f25db5c44b41f264aeb7
+- name: github.com/upamune/go-esa
+  version: 5c8b430b0e94e1cfff251624f7ae979b7a411f73
+  subpackages:
+  - esa
 - name: github.com/urfave/cli
   version: a14d7d367bc02b1f57d88de97926727f2d936387
 - name: github.com/vmihailenco/bufio
