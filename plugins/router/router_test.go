@@ -41,10 +41,9 @@ func TestPlugin_filter(t *testing.T) {
 		},
 	}
 
-	p := &plugin{}
 	for i, ts := range testCases {
-		channelName, isMatched := p.filter(ts.command, ts.message)
-		as.Equal(channelName, ts.channelName, "testCase [%d]", i)
+		f := newFilter("id", ts.command)
+		isMatched := f.execute(ts.message)
 		as.Equal(isMatched, ts.isMatched, "testCase [%d]", i)
 	}
 }

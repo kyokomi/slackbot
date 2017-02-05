@@ -68,7 +68,11 @@ func (r *redisRepository) LoadList(key string) ([]string, error) {
 }
 
 func (r *redisRepository) Load(key string) (string, error) {
-	return r.redisDB.Get(key).Result()
+	cmd := r.redisDB.Get(key)
+	if cmd.Err() == redis.Nil {
+		return "", nil
+	}
+	return cmd.Result()
 }
 
 func (r *redisRepository) Save(key string, value string) error {

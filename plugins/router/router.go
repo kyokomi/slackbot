@@ -2,12 +2,37 @@ package router
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/kyokomi/slackbot"
 	"github.com/kyokomi/slackbot/plugins"
 	"github.com/nlopes/slack"
+)
+
+const (
+	triggerWord = "router"
+
+	helpText = `
+	register:
+		router add <channel_name> <expr> (<exclude>)
+	response:
+		<router_id>
+
+	delete:
+		router del <router_id>
+	response:
+		delete routing.
+
+	list:
+		router list
+	response:
+		show added routing list.
+
+	help:
+		router help
+	response:
+		show this help.
+`
 )
 
 type plugin struct {
@@ -27,37 +52,77 @@ func (p *plugin) CheckMessage(ev plugins.BotEvent, message string) (bool, string
 }
 
 func (p *plugin) DoAction(ev plugins.BotEvent, message string) bool {
-	args, ok := ev.BotCmdArgs(message)
-	if ok {
-		// TODO: Save or Delete or List
+	c := Command{}
+	ok, err := c.Scan(message)
+	if err != nil {
+		ev.Reply("command scan error " + err.Error())
 		return false
 	}
-	_ = args
 
-	list, err := p.repository.LoadList(p.repositoryKey(ev.ChannelID()))
-	if err != nil {
-		ev.Reply(fmt.Sprintf("repository error %s", err.Error()))
-		return true
+	if ok && c.Trigger == triggerWord {
+		switch c.Action {
+		case AddAction:
+			addFilter := newFilter(c.RouterID, c.FilterArgs)
+			if err := p.saveAddFilter(ev.ChannelID(), addFilter); err != nil {
+				ev.Reply("AddAction error " + err.Error())
+				return false
+			}
+			ev.Reply("save rotuter " + c.Message())
+		case DelAction, DeleteAction:
+			if err := p.saveDeleteFilter(ev.ChannelID(), c.RouterID); err != nil {
+				ev.Reply("DelAction error " + err.Error())
+				return false
+			}
+			ev.Reply("delete router " + c.RouterID)
+		case ListAction:
+			fs, err := p.loadFilters(ev.ChannelID())
+			if err != nil {
+				ev.Reply("ListAction error " + err.Error())
+				return false
+			}
+
+			if len(fs) > 0 {
+				message := []string{}
+				for _, f := range fs {
+					message = append(message, f.String())
+				}
+				ev.Reply(strings.Join(message, "\n"))
+			} else {
+				ev.Reply("not routing")
+			}
+		case HelpAction:
+			ev.Reply(fmt.Sprintf("```\n%s\n```", helpText))
+		default:
+			ev.Reply(fmt.Sprintf("not support command [%s]", c.String()))
+		}
+		return false
 	}
 
-	list = []string{`#random`} // TODO: test
+	fs, err := p.loadFilters(ev.ChannelID())
+	if err != nil {
+		// 通常のメッセージが通るのでスルーする
+		return true // next ok
+	}
 
-	for _, value := range list {
-		channelName, ok := p.filter(value, message)
-		if !ok {
+	for _, f := range fs {
+		if ev.SenderID() == ev.BotID() {
+			continue
+		}
+		if f.ChannelName == ev.ChannelName() {
+			continue
+		}
+		if ok := f.execute(message); !ok {
 			continue
 		}
 
-		// TODO: 最初にやってしまってもよいかも?
 		chs, err := p.client.GetChannels(true)
 		if err != nil {
-			ev.Reply(fmt.Sprintf("GetChannelInfo name=[%s] error %s", channelName, err.Error()))
+			ev.Reply(fmt.Sprintf("GetChannelInfo name=[%s] error %s", f.ChannelName, err.Error()))
 			continue
 		}
 
 		for _, ch := range chs {
-			// TODO: replacer作っておく
-			if ch.Name == strings.Replace(channelName, "#", "", -1) {
+			if ch.Name == strings.Replace(f.ChannelName, "#", "", -1) {
 				ev.SendMessage(ev.ArchivesURL(), ch.ID)
 			}
 		}
@@ -65,35 +130,12 @@ func (p *plugin) DoAction(ev plugins.BotEvent, message string) bool {
 	return true // next ok
 }
 
-func (p *plugin) filter(value string, message string) (string, bool) {
-	args := quotationOrSpaceFields(value)
-	// hoge.* .*fuga.* #random
-	channelName := args[0]
-
-	if len(args) >= 2 {
-		expr := args[1]
-		if matched, err := regexp.MatchString(expr, message); err != nil || !matched {
-			return "", false
-		}
-	}
-
-	if len(args) >= 3 {
-		exclude := args[2]
-		if matched, err := regexp.MatchString(exclude, message); err != nil || matched {
-			return "", false
-		}
-	}
-
-	return channelName, true
-}
-
 func (p *plugin) repositoryKey(channelID string) string {
 	return fmt.Sprintf("router:%s", channelID)
 }
 
 func (p *plugin) Help() string {
-	return `echo:
-	all message echo
+	return `router:
 	`
 }
 
