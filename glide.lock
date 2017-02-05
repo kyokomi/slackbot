@@ -1,5 +1,5 @@
-hash: 74f263176b108010487df2204dda5fa6f5932cae76c3915317450a657cc7bec0
-updated: 2017-01-01T23:47:33.256649415+09:00
+hash: 22cfb7d6fcb121af5ba4ddef893cbae46876fa990f54c15923c717ab29c3b7f4
+updated: 2017-02-05T10:51:25.141086989+09:00
 imports:
 - name: github.com/andybalholm/cascadia
   version: 349dd0209470eabd9514242c688c403c0926d266
@@ -60,4 +60,16 @@ imports:
   - internal/pool
 - name: gopkg.in/vmihailenco/msgpack.v1
   version: 721f2af77065519b762a8d5fa2b441d29e96bbca
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
