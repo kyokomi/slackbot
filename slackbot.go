@@ -21,14 +21,24 @@ type BotContext interface {
 	SendMessage(message, channel string)
 }
 
-type botContext struct {
+type Context struct {
 	Plugins plugins.PluginManager
 	Client  *slack.Client
 	RTM     *slack.RTM
 }
 
-func (b *botContext) PluginManager() plugins.PluginManager {
+func (b *Context) PluginManager() plugins.PluginManager {
 	return b.Plugins
+}
+
+func NewContext(token string) (*Context, error) {
+	ctx, err := NewBotContextNotSysstd(token)
+	if err != nil {
+		return nil, err
+	}
+	ctx.AddPlugin("sysstd", sysstd.NewPlugin(ctx.PluginManager()))
+
+	return ctx, nil
 }
 
 func NewBotContext(token string) (BotContext, error) {
@@ -41,12 +51,12 @@ func NewBotContext(token string) (BotContext, error) {
 	return ctx, nil
 }
 
-func NewBotContextNotSysstd(token string) (BotContext, error) {
+func NewBotContextNotSysstd(token string) (*Context, error) {
 	if token == "" {
 		return nil, errors.New("ERROR: slack token not found")
 	}
 
-	ctx := &botContext{}
+	ctx := &Context{}
 	ctx.Client = slack.New(token)
 	ctx.Client.SetDebug(true) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginManager(ctx)
@@ -54,21 +64,21 @@ func NewBotContextNotSysstd(token string) (BotContext, error) {
 	return ctx, nil
 }
 
-func (ctx *botContext) AddPlugin(key interface{}, val plugins.BotMessagePlugin) {
+func (ctx *Context) AddPlugin(key interface{}, val plugins.BotMessagePlugin) {
 	fmt.Println("insert plugin ", key)
 	ctx.Plugins.AddPlugin(key, val)
 }
 
-func (ctx *botContext) Run(connectedFunc func(event plugins.BotEvent)) {
+func (ctx *Context) Run(connectedFunc func(event plugins.BotEvent)) {
 	ctx.webSocketRTM(connectedFunc)
 }
 
 // WebSocketRTM is Deprecated
-func (ctx *botContext) WebSocketRTM() {
+func (ctx *Context) WebSocketRTM() {
 	ctx.webSocketRTM(func(event plugins.BotEvent) { log.Println("connected ", event.Channel()) })
 }
 
-func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) {
+func (ctx *Context) webSocketRTM(connectedFunc func(event plugins.BotEvent)) {
 	if ctx.RTM != nil {
 		ctx.RTM.Disconnect()
 	}
@@ -86,9 +96,11 @@ func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) 
 					botUser := ctx.RTM.GetInfo().User
 					for _, c := range ev.Info.Channels {
 						connectedFunc(plugins.NewBotEvent(ctx,
+							ctx.RTM.GetInfo().Team.Domain,
 							botUser.ID, botUser.Name,
 							ev.Info.User.ID, ev.Info.User.Name, "connected",
 							c.ID, c.Name,
+							"",
 						))
 					}
 				case *slack.MessageEvent:
@@ -107,7 +119,7 @@ func (ctx *botContext) webSocketRTM(connectedFunc func(event plugins.BotEvent)) 
 	}()
 }
 
-func (ctx *botContext) responseEvent(ev *slack.MessageEvent) plugins.BotEvent {
+func (ctx *Context) responseEvent(ev *slack.MessageEvent) plugins.BotEvent {
 	botUser := ctx.RTM.GetInfo().User
 
 	var chName string
@@ -117,12 +129,19 @@ func (ctx *botContext) responseEvent(ev *slack.MessageEvent) plugins.BotEvent {
 	}
 
 	return plugins.NewBotEvent(ctx,
-		botUser.ID, botUser.Name,
-		ev.User, ev.Username, ev.Text, ev.Channel, chName,
+		ctx.RTM.GetInfo().Team.Domain,
+		botUser.ID,
+		botUser.Name,
+		ev.User,
+		ev.Username,
+		ev.Text,
+		ev.Channel,
+		chName,
+		ev.Timestamp,
 	)
 }
 
-func (ctx *botContext) SendMessage(message, channel string) {
+func (ctx *Context) SendMessage(message, channel string) {
 	if !ctx.Plugins.IsReply() {
 		return
 	}
@@ -132,4 +151,4 @@ func (ctx *botContext) SendMessage(message, channel string) {
 	}
 }
 
-var _ plugins.MessageSender = (*botContext)(nil)
+var _ plugins.MessageSender = (*Context)(nil)

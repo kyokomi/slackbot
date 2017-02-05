@@ -38,9 +38,11 @@ var _ MessageSender = (*DebugMessageSender)(nil)
 
 func NewTestEvent(message string) BotEvent {
 	return NewBotEvent(DebugMessageSender{},
+		"example-domain",
 		"botID", "botName",
 		"userID", "userName",
 		message,
 		"CH_AAAAAAA", "#general",
+		"1485072037.000010",
 	)
 }

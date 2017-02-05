@@ -2,6 +2,7 @@ package googleimage
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -35,6 +36,11 @@ func (g googleImageAPIClient) GetImageLinks(query string) ([]string, error) {
 	if err != nil {
 		log.Println(err)
 		return nil, err
+	}
+
+	if resp.StatusCode >= 400 {
+		data, _ := ioutil.ReadAll(resp.Body)
+		return nil, fmt.Errorf("get request error statusCode %s \n%s", resp.Status, string(data))
 	}
 
 	j, err := simplejson.NewFromReader(resp.Body)
