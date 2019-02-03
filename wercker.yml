@@ -1,7 +1,6 @@
 box: golang
 build:
   steps:
-    - glide-install
     - setup-go-workspace
     - script:
         name: go test
@@ -14,7 +13,6 @@ build:
 
 goveralls:
   steps:
-    - glide-install
     - setup-go-workspace
     - script:
         name: coverage
