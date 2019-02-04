@@ -1,7 +1,9 @@
-box: golang
+box:
+  id: golang
+  env:
+    GO111MODULE: on
 build:
   steps:
-    - glide-install
     - setup-go-workspace
     - script:
         name: go test
@@ -14,7 +16,6 @@ build:
 
 goveralls:
   steps:
-    - glide-install
     - setup-go-workspace
     - script:
         name: coverage

@@ -58,7 +58,7 @@ func NewBotContextNotSysstd(token string) (*Context, error) {
 
 	ctx := &Context{}
 	ctx.Client = slack.New(token)
-	ctx.Client.SetDebug(true) // TODO: あとで
+	slack.OptionDebug(true)(ctx.Client) // TODO: あとで
 	ctx.Plugins = plugins.NewPluginManager(ctx)
 
 	return ctx, nil

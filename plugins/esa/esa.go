@@ -41,7 +41,11 @@ func (p *plugin) CheckMessage(_ plugins.BotEvent, message string) (bool, string)
 
 // DoAction is replay url detail message
 func (p *plugin) DoAction(event plugins.BotEvent, message string) bool {
-	u, _ := url.Parse(message)
+	u, err := url.Parse(message)
+	if err != nil {
+		event.Reply(fmt.Sprintf("url.Parse error %s", err.Error()))
+		return true
+	}
 
 	var postNumber int
 	paths := strings.Split(u.Path, "/")
