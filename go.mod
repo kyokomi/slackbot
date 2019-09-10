@@ -18,10 +18,8 @@ require (
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/robfig/cron v1.2.0
-	github.com/russross/blackfriday v2.0.0+incompatible // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/testify v1.4.0
-	github.com/ugorji/go v1.1.7 // indirect
+	github.com/ugorji/go/codec v1.1.7 // indirect
 	github.com/upamune/go-esa v0.0.0-20170528094022-b989405b568d
 	github.com/urfave/cli v1.22.0
 	github.com/vmihailenco/bufio v0.0.0-20140618134113-fe7b595919de // indirect
