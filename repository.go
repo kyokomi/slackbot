@@ -1,9 +1,10 @@
 package slackbot
 
 import (
+	"fmt"
 	"time"
 
-	"gopkg.in/redis.v3"
+	redis "gopkg.in/redis.v3"
 )
 
 // Repository is slackbot common repository interface
@@ -27,11 +28,23 @@ type inMemoryRepository struct {
 }
 
 func (r *inMemoryRepository) LoadList(key string) ([]string, error) {
-	return r.memory[key].([]string), nil
+	result := []string{}
+	if v, ok := r.memory[key]; ok {
+		if result, ok = v.([]string); !ok {
+			return []string{}, fmt.Errorf("not set string slice. key: %s", key)
+		}
+	}
+	return result, nil
 }
 
 func (r *inMemoryRepository) Load(key string) (string, error) {
-	return r.memory[key].(string), nil
+	var result string
+	if v, ok := r.memory[key]; ok {
+		if result, ok = v.(string); !ok {
+			return "", fmt.Errorf("not set string. key: %s", key)
+		}
+	}
+	return result, nil
 }
 
 func (r *inMemoryRepository) Save(key string, value string) error {
