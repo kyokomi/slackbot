@@ -2,12 +2,15 @@ module github.com/kyokomi/slackbot
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.0
+	github.com/alicebob/gopher-json v0.0.0-20180125190556-5a6b3ba71ee6 // indirect
+	github.com/alicebob/miniredis v2.5.0+incompatible
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/garyburd/redigo v1.6.0 // indirect
 	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kyokomi/go-docomo v1.0.0
@@ -24,6 +27,7 @@ require (
 	github.com/urfave/cli v1.22.0
 	github.com/vmihailenco/bufio v0.0.0-20140618134113-fe7b595919de // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
+	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036 // indirect
 	golang.org/x/net v0.0.0-20190909003024-a7b16738d86b
 	golang.org/x/sys v0.0.0-20190910064555-bbd175535a8b // indirect
 	google.golang.org/appengine v1.6.2 // indirect
